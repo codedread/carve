@@ -1,0 +1,15 @@
+{
+  "include": [
+      "src/**/*",
+  ],
+  "compilerOptions": {
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "module": "esnext",
+    "outDir": "dist",
+    "sourceMap": true,
+    "target": "esnext"
+  }
+}

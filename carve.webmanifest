@@ -1,0 +1,14 @@
+{
+  "name": "Carve SVG Editor",
+  "description": "Editor for SVG images",
+  "short_name": "carve",
+  "icons": [
+    {
+      "src": "images/logo.svg",
+      "sizes": "192x192 512x512 800x800 1000x1000",
+      "type": "image/svg+xml"
+    }
+  ],
+  "display": "standalone",
+  "start_url": "/carve/index.html"
+}
