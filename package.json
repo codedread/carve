@@ -1,0 +1,30 @@
+{
+  "name": "@codedread/carve",
+  "version": "0.0.1",
+  "description": "carve is a vector graphics editor",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "copy-files": "copyfiles -u 1 -e \"src/**/*.ts\" src/*.* \"src/**/*.*\" dist",
+    "deploy": "npm run build && npm run copy-files && gh-pages -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codedread/carve.git"
+  },
+  "keywords": [
+    "svg",
+    "vector graphics",
+    "image editor"
+  ],
+  "author": "Jeff Schiller",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codedread/carve/issues"
+  },
+  "homepage": "https://github.com/codedread/carve",
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "gh-pages": "^3.2.3"
+  }
+}
