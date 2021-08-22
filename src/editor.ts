@@ -1,6 +1,7 @@
 import { CarveAction } from './actions.js';
 import { CarveDocument, createDocumentFromFile, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
+import { CarveRectangleButton } from './core-toolbar-buttons.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
 import { FileSystemFileHandle } from './types/filesystem.js';
@@ -82,7 +83,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       switch (action) {
         case CarveAction.NEW_DOCUMENT: this.doNewDoc(); break;
         case CarveAction.OPEN_DOCUMENT: this.doOpenDoc(); break;
-        case CarveAction.RECTANGLE_MODE: this.currentModeTool = this.rectTool; break;
+        case CarveAction.RECTANGLE_MODE:
+          (this.querySelector('carve-rectangle-button') as CarveRectangleButton).active = true;
+          this.currentModeTool = this.rectTool;
+          break;
       }
     }
   }

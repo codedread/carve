@@ -1,5 +1,5 @@
 import { CarveAction } from './actions.js';
-import { ToolbarButton } from './toolbar-button.js';
+import { ToolbarButton, ToolbarModeButton } from './toolbar-button.js';
 
 export class CarveNewButton extends ToolbarButton {
   getAction(): CarveAction { return CarveAction.NEW_DOCUMENT; }
@@ -15,7 +15,7 @@ export class CarveOpenButton extends ToolbarButton {
   }
 }
 
-export class CarveRectangleButton extends ToolbarButton {
+export class CarveRectangleButton extends ToolbarModeButton {
   getAction(): CarveAction { return CarveAction.RECTANGLE_MODE; }
   getButtonDOM(): string {
     return `<span>R</span>`;

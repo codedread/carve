@@ -9,7 +9,7 @@ export class CarveDocument {
   /** Any commands lower in the stack than this index have been applied. */
   private commandIndex: number = 0;
   /** A stack of all commands in this document's memory. */
-  private commandHistory: Command[];
+  private commandHistory: Command[] = [];
 
   constructor(private doc: SVGDocument, private fileHandle?: FileSystemFileHandle) {}
 

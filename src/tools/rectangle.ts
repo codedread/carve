@@ -32,20 +32,22 @@ export class RectangleTool extends Tool {
   }
 
   onMouseUp(evt: CarveMouseEvent) {
-    this.isDrawing = false;
-    this.endPoint = new Point(evt.carveX, evt.carveY);
+    if (this.isDrawing) {
+      this.isDrawing = false;
+      this.endPoint = new Point(evt.carveX, evt.carveY);
 
-    // Do not create a rect if it would be zero width/height.
-    if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-      this.host.execute(new InsertElementCommand(this.drawingElem));
-      console.log(`RectangleTool: Created a rectangle`);
-    } else {
-      this.drawingElem.parentElement.removeChild(this.drawingElem);
-      console.log(`RectangleTool: Abandoned creating a rectangle`);
+      // Do not create a rect if it would be zero width/height.
+      if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
+        this.host.execute(new InsertElementCommand(this.drawingElem));
+        console.log(`RectangleTool: Created a rectangle`);
+      } else {
+        this.drawingElem.parentElement.removeChild(this.drawingElem);
+        console.log(`RectangleTool: Abandoned creating a rectangle`);
+      }
+
+      this.host.getOverlay().innerHTML = '';
+      this.cleanUp();
     }
-
-    this.host.getOverlay().innerHTML = '';
-    this.cleanUp();
   }
 
   onMouseMove(evt: CarveMouseEvent) {
