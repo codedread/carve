@@ -2,6 +2,7 @@ import { CarveAction } from './actions.js';
 import { CarveDocument, createDocumentFromFile, createNewDocument } from './document.js';
 import { FileSystemFileHandle } from './types/filesystem.js';
 import { keyToAction } from './keys.js';
+import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -20,6 +21,7 @@ export class CarveEditor extends HTMLElement {
     super();
     this.createShadowDOM();
     window.addEventListener('keyup', this);
+    this.addEventListener(TOOLBAR_CLICKED_TYPE, this);
     createNewDocument().then(doc => this.switchDocument(doc));
   }
 
@@ -27,6 +29,8 @@ export class CarveEditor extends HTMLElement {
     let action: CarveAction;
     if (e instanceof KeyboardEvent) {
       action = keyToAction(e.key);
+    } else if (e instanceof ToolbarClickedEvent) {
+      action = e.action;
     }
 
     switch (action) {
@@ -39,19 +43,21 @@ export class CarveEditor extends HTMLElement {
     this.attachShadow({mode: 'open'}).innerHTML = `
       <style type="text/css">
         #${CARVE_TOP_DIV} {
-          background-color: lightgrey;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
+          position: relative;
+          width: 100%;
+          height: 100%;
         }
-        svg#${CARVE_WORK_AREA} {
+        #${CARVE_WORK_AREA} {
           background-color: lightgrey;
+          position: relative;
+          top: 2em;
+          width: 100%;
+          height: calc(100% - 2em);
         }
       </style>
       <div id="${CARVE_TOP_DIV}">
-        <svg id="${CARVE_WORK_AREA}" xmlns="${SVGNS}" width="100%" height="100%" viewBox="0 0 100 100">
+        <slot name="toolbar"></slot>
+        <svg id="${CARVE_WORK_AREA}" xmlns="${SVGNS}" viewBox="0 0 100 100">
           <svg id="${CARVE_BACKGROUND}" xmlns="${SVGNS}"x="5" y="5" width="90" height="90" viewBox="0 0 100 100">
             <rect x="0" y="0" width="100" height="100" fill="white" />
           </svg>
