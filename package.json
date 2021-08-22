@@ -4,9 +4,9 @@
   "description": "carve is a vector graphics editor",
   "type": "module",
   "scripts": {
-    "build": "tsc",
     "copy-files": "copyfiles -u 1 -e \"src/**/*.ts\" src/*.* \"src/**/*.*\" dist",
-    "deploy": "npm run build && npm run copy-files && gh-pages -d dist"
+    "build": "tsc && npm run copy-files",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
