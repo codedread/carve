@@ -1,0 +1,1 @@
+{"version":3,"file":"carve-mouse-event.js","sourceRoot":"","sources":["../src/carve-mouse-event.ts"],"names":[],"mappings":"AAAA,2DAA2D;AAC3D,MAAM,OAAO,eAAe;IAC1B,YAAmB,MAAc,EACd,MAAc,EACd,UAAkB,EAClB,UAAkB,EAClB,UAAsB;QAJtB,WAAM,GAAN,MAAM,CAAQ;QACd,WAAM,GAAN,MAAM,CAAQ;QACd,eAAU,GAAV,UAAU,CAAQ;QAClB,eAAU,GAAV,UAAU,CAAQ;QAClB,eAAU,GAAV,UAAU,CAAY;IAAG,CAAC;CAC9C"}

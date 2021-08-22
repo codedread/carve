@@ -1,0 +1,1 @@
+{"version":3,"file":"tool.js","sourceRoot":"","sources":["../../src/tools/tool.ts"],"names":[],"mappings":"AAGA;;;GAGG;AACH,MAAM,OAAO,IAAI;IACf,YAAsB,IAAgB;QAAhB,SAAI,GAAJ,IAAI,CAAY;IAAG,CAAC;IAE1C,WAAW,CAAC,GAAoB,IAAG,CAAC;IACpC,WAAW,CAAC,GAAoB,IAAG,CAAC;IACpC,SAAS,CAAC,GAAoB,IAAG,CAAC;CACnC"}

@@ -5,6 +5,14 @@ export class CarveDocument {
     constructor(doc, fileHandle) {
         this.doc = doc;
         this.fileHandle = fileHandle;
+        /** Any commands lower in the stack than this index have been applied. */
+        this.commandIndex = 0;
+        /** A stack of all commands in this document's memory. */
+        this.commandHistory = [];
+    }
+    addCommandToStack(cmd) {
+        this.commandHistory.push(cmd);
+        this.commandIndex = this.commandHistory.length;
     }
     getSVG() {
         return this.doc.rootElement;
@@ -13,6 +21,7 @@ export class CarveDocument {
 /** Creates an empty CarveDocument with a blank SVG document. */
 export function createNewDocument() {
     const doc = document.implementation.createDocument('http://www.w3.org/2000/svg', 'svg', null);
+    doc.documentElement.setAttribute('viewBox', '0 0 100 100');
     console.log('Empty Carve document created.');
     return Promise.resolve(new CarveDocument(doc));
 }
