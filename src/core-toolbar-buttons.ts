@@ -14,3 +14,10 @@ export class CarveOpenButton extends ToolbarButton {
     return `<span>O</span>`;
   }
 }
+
+export class CarveRectangleButton extends ToolbarButton {
+  getAction(): CarveAction { return CarveAction.RECTANGLE_MODE; }
+  getButtonDOM(): string {
+    return `<span>R</span>`;
+  }
+}

@@ -1,3 +1,4 @@
+import { Command } from './commands/command.js';
 import { FileSystemFileHandle } from './types/filesystem.js';
 import { SVGDocument } from './types/svg.js';
 
@@ -5,7 +6,17 @@ import { SVGDocument } from './types/svg.js';
  * Wraps an SVG document and stores changes to it.
  */
 export class CarveDocument {
+  /** Any commands lower in the stack than this index have been applied. */
+  private commandIndex: number = 0;
+  /** A stack of all commands in this document's memory. */
+  private commandHistory: Command[];
+
   constructor(private doc: SVGDocument, private fileHandle?: FileSystemFileHandle) {}
+
+  addCommandToStack(cmd: Command) {
+    this.commandHistory.push(cmd);
+    this.commandIndex = this.commandHistory.length;
+  }
 
   getSVG(): SVGSVGElement {
     return this.doc.rootElement;
@@ -17,6 +28,7 @@ export class CarveDocument {
 export function createNewDocument(): Promise<CarveDocument> {
   const doc: Document = document.implementation.createDocument(
       'http://www.w3.org/2000/svg', 'svg', null);
+  doc.documentElement.setAttribute('viewBox', '0 0 100 100');
   console.log('Empty Carve document created.')
   return Promise.resolve(new CarveDocument(doc as SVGDocument));
 }
