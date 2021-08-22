@@ -5,9 +5,13 @@
     <link rel="manifest" href="carve.webmanifest" />
     <link rel="icon" type="image/png" href="images/logo.svg" sizes="300x300" />
     <link rel="apple-touch-icon" href="images/logo.svg" />
+    <link rel="stylesheet" type="text/css" href="carve.css" />
     <script type="module" src="carve.js"></script>
   </head>
   <body>
-    <carve-editor></carve-editor>
+    <carve-editor>
+      <carve-new-button slot="toolbar"></carve-new-button>
+      <carve-open-button slot="toolbar"></carve-open-button>
+    </carve-editor>
   </body>
 </html>
