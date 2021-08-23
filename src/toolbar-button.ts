@@ -20,7 +20,17 @@ export abstract class ToolbarButton extends HTMLElement {
 
   protected getButtonStyle(): string {
     return `button {
-      border-width: 2px;
+      background-color: lightgrey;
+      border-style: outset;
+      border-width: 1px;
+      height: 3em;
+      margin: 2px 0 0 2px;
+      padding: 0;
+      width: 3em;
+    }
+    button:active {
+      background-color: #c5c5c5;
+      border-style: inset;
     }`;
   }
 

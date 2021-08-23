@@ -101,10 +101,11 @@ export class CarveEditor extends HTMLElement implements EditorHost {
         }
         #${CARVE_WORK_AREA} {
           background-color: lightgrey;
-          position: relative;
-          top: 2em;
-          width: 100%;
+          position: absolute;
           height: calc(100% - 2em);
+          left: 0;
+          top: 3em;
+          width: 100%;
         }
       </style>
       <div id="${CARVE_TOP_DIV}">

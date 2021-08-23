@@ -60,6 +60,8 @@ export class RectangleTool extends Tool {
           `${(this.endPoint.x < this.startPoint.x) ? this.endPoint.x : this.startPoint.x}`);
       this.drawingElem.setAttribute('y',
           `${(this.endPoint.y < this.startPoint.y) ? this.endPoint.y : this.startPoint.y}`);
+      this.drawingElem.setAttribute('stroke-width', '1');
+      this.drawingElem.setAttribute('stroke', 'black');
     }
   }
 
