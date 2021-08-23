@@ -5,6 +5,7 @@ import { RectangleTool } from './tools/rectangle.js';
 import { SVGNS } from './constants.js';
 import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
 import { keyToAction } from './keys.js';
+import { EllipseTool } from './tools/ellipse.js';
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
 const CARVE_BACKGROUND = 'carveBackground';
@@ -20,6 +21,7 @@ export class CarveEditor extends HTMLElement {
         this.createShadowDOM();
         // Set up tools.
         this.rectTool = new RectangleTool(this);
+        this.ellipseTool = new EllipseTool(this);
         // Listen for events.
         window.addEventListener('keyup', this);
         this.addEventListener(TOOLBAR_CLICKED_TYPE, this);
@@ -73,6 +75,10 @@ export class CarveEditor extends HTMLElement {
                     this.querySelector('carve-rectangle-button').active = true;
                     this.currentModeTool = this.rectTool;
                     break;
+                case CarveAction.ELLIPSE_MODE:
+                    this.querySelector('carve-ellipse-button').active = true;
+                    this.currentModeTool = this.ellipseTool;
+                    break;
             }
         }
     }
@@ -86,10 +92,11 @@ export class CarveEditor extends HTMLElement {
         }
         #${CARVE_WORK_AREA} {
           background-color: lightgrey;
-          position: relative;
-          top: 2em;
-          width: 100%;
+          position: absolute;
           height: calc(100% - 2em);
+          left: 0;
+          top: 3em;
+          width: 100%;
         }
       </style>
       <div id="${CARVE_TOP_DIV}">

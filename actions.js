@@ -10,5 +10,6 @@ export const CarveAction = {
     OPEN_DOCUMENT: 'open_document',
     // Drawing Actions.
     RECTANGLE_MODE: 'rectangle_mode',
+    ELLIPSE_MODE: 'ellipse_mode',
 };
 //# sourceMappingURL=actions.js.map

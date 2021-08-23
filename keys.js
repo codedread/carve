@@ -7,6 +7,7 @@ export function keyToAction(key) {
         case 'o': return CarveAction.OPEN_DOCUMENT;
         // Drawing modes.
         case 'r': return CarveAction.RECTANGLE_MODE;
+        case 'e': return CarveAction.ELLIPSE_MODE;
     }
     return null;
 }
