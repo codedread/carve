@@ -1,7 +1,7 @@
 import { CarveAction } from './actions.js';
 import { CarveDocument, createDocumentFromFile, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
-import { CarveRectangleButton } from './core-toolbar-buttons.js';
+import { CarveRectangleButton, CarveEllipseButton } from './core-toolbar-buttons.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
 import { FileSystemFileHandle } from './types/filesystem.js';
@@ -10,6 +10,7 @@ import { SVGNS } from './constants.js';
 import { Tool } from './tools/tool.js';
 import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
 import { keyToAction } from './keys.js';
+import { EllipseTool } from './tools/ellipse.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -32,6 +33,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
   // Known tools.
   private rectTool: RectangleTool;
+  private ellipseTool: EllipseTool;
 
   constructor() {
     super();
@@ -39,6 +41,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
     // Set up tools.
     this.rectTool = new RectangleTool(this);
+    this.ellipseTool = new EllipseTool(this);
 
     // Listen for events.
     window.addEventListener('keyup', this);
@@ -86,6 +89,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
         case CarveAction.RECTANGLE_MODE:
           (this.querySelector('carve-rectangle-button') as CarveRectangleButton).active = true;
           this.currentModeTool = this.rectTool;
+          break;
+        case CarveAction.ELLIPSE_MODE:
+          (this.querySelector('carve-ellipse-button') as CarveEllipseButton).active = true;
+          this.currentModeTool = this.ellipseTool;
           break;
       }
     }

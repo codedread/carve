@@ -13,6 +13,7 @@ export const CarveAction = {
 
   // Drawing Actions.
   RECTANGLE_MODE: 'rectangle_mode',
+  ELLIPSE_MODE: 'ellipse_mode',
 }
 
 // It is confusing to have a type the same name as the above object, but Typescript allows this.
