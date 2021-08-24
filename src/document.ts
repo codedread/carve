@@ -6,12 +6,25 @@ import { SVGDocument } from './types/svg.js';
  * Wraps an SVG document and stores changes to it.
  */
 export class CarveDocument {
+  /** The root document element. */
+  private svgElem: SVGSVGElement;
+  /** The explicit x,y,width,height attributes on the original SVG document. */
+  private readonly origDocAttrs = new Map<string, string>();
+
   /** Any commands lower in the stack than this index have been applied. */
   private commandIndex: number = 0;
   /** A stack of all commands in this document's memory. */
   private commandHistory: Command[] = [];
 
-  constructor(private doc: SVGDocument, private fileHandle?: FileSystemFileHandle) {}
+  constructor(svgEl: SVGSVGElement, private fileHandle?: FileSystemFileHandle) {
+    this.svgElem = document.adoptNode(svgEl);
+    for (const attr of ['x', 'y', 'width', 'height']) {
+      if (this.svgElem.hasAttribute(attr)) {
+        this.origDocAttrs.set(attr, this.svgElem.getAttribute(attr));
+        this.svgElem.removeAttribute(attr);
+      }
+    }
+  }
 
   addCommandToStack(cmd: Command) {
     this.commandHistory.push(cmd);
@@ -19,7 +32,7 @@ export class CarveDocument {
   }
 
   getSVG(): SVGSVGElement {
-    return this.doc.rootElement;
+    return this.svgElem;
   }
 }
 
@@ -30,7 +43,7 @@ export function createNewDocument(): Promise<CarveDocument> {
       'http://www.w3.org/2000/svg', 'svg', null);
   doc.documentElement.setAttribute('viewBox', '0 0 100 100');
   console.log('Empty Carve document created.')
-  return Promise.resolve(new CarveDocument(doc as SVGDocument));
+  return Promise.resolve(new CarveDocument((doc as SVGDocument).rootElement));
 }
 
 /**
@@ -49,7 +62,7 @@ export function createDocumentFromFile(fileHandle: FileSystemFileHandle): Promis
             reject(doc.documentElement.textContent);
           }
           console.log('Carve document loaded and parsed.')
-          resolve(new CarveDocument(doc as SVGDocument, fileHandle));
+          resolve(new CarveDocument((doc as SVGDocument).rootElement, fileHandle));
         } catch (err) {
           reject(err);
         }
