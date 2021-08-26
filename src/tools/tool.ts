@@ -9,7 +9,7 @@ export class Tool {
   constructor(protected host: EditorHost) {}
 
   // Override these.
-  getActions(): string[] { return []; }
+  getActions(): string[] { throw `No actions for tool ${this.constructor.name}`; }
   getDescription(): string { return null; }
 }
 

@@ -1,10 +1,9 @@
 import { CarveAction } from './actions.js';
-import { CarveDocument, createDocumentFromFile, createNewDocument } from './document.js';
+import { CarveDocument, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
 import { CarveRectangleButton, CarveEllipseButton } from './core-toolbar-buttons.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
-import { FileSystemFileHandle } from './types/filesystem.js';
 import { RectangleTool } from './tools/rectangle.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
@@ -41,7 +40,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   private viewBox: Box = new Box();
 
   private toolActionRegistry: Map<string, Tool> = new Map();
-
+  private keyActionRegistry: Map<string, string> = new Map();
+  
   private currentModeTool: ModeTool = null;
 
   // Known tools.
@@ -106,7 +106,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       } else {
         // Remove all this eventually.
         switch (action) {
-          case CarveAction.OPEN_DOCUMENT: this.doOpenDoc(); break;
           case CarveAction.RECTANGLE_MODE:
             (this.querySelector('carve-rectangle-button') as CarveRectangleButton).active = true;
             this.currentModeTool = this.rectTool;
@@ -118,6 +117,19 @@ export class CarveEditor extends HTMLElement implements EditorHost {
         }
       }
     }
+  }
+
+  /** Registers an Action with the Editor by its keystroke. */
+  registerKeyBinding(key: string, action: string) {
+    if (!this.toolActionRegistry.has(action)) {
+      throw `Key binding attempted for action '${action} without a registered tool.`;
+    }
+
+    if (this.keyActionRegistry.has(key)) {
+      throw `Key binding for '${key}' already bound to action '${action}'`;
+    }
+
+    this.keyActionRegistry.set(key, action);
   }
 
   /**
@@ -163,14 +175,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
-  /** Registers a tool to handle a given action. */
-  private registerToolForAction(action: string, tool: Tool) {
-    if (this.toolActionRegistry.has(action)) {
-      throw `Already registered a tool to handle action '${action}`;
-    }
-    this.toolActionRegistry.set(action, tool);
-  }
-
   private createShadowDOM() {
     const X = M*100;
     const Y = M*100;
@@ -210,25 +214,13 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.overlayElem = this.shadowRoot.querySelector(`#${CARVE_OVERLAY}`);
   }
 
-  private async doOpenDoc() {
-    if (window['showOpenFilePicker']) {
-      try {
-        const handleArray: FileSystemFileHandle[] = await window['showOpenFilePicker']({
-          multiple: false,
-          types: [
-            {
-              description: 'SVG files',
-              // Add svgz to the accept extensions?
-              accept: { 'image/svg+xml': ['.svg'] },
-            },
-          ],
-        });
-        this.switchDocument(await createDocumentFromFile(handleArray[0]));
-      } catch (err) {
-        alert(err);
-      }
+  
+  /** Registers a tool to handle a given action. */
+  private registerToolForAction(action: string, tool: Tool) {
+    if (this.toolActionRegistry.has(action)) {
+      throw `Already registered a tool to handle action '${action}`;
     }
-    // Else, do the old file picker input thing.
+    this.toolActionRegistry.set(action, tool);
   }
 
   private resizeWorkArea() {
