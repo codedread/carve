@@ -1,10 +1,8 @@
-import { CarveAction } from './actions.js';
-
 export const TOOLBAR_CLICKED_TYPE = 'toolbar-clicked';
 
 /** Event for when the toolbar button is clicked. */
 export class ToolbarClickedEvent extends Event {
-  constructor(public action: CarveAction) {
+  constructor(public action: string) {
     super(TOOLBAR_CLICKED_TYPE, { bubbles: true });
   }
 }
@@ -15,7 +13,7 @@ export abstract class ToolbarButton extends HTMLElement {
     super();
   }
 
-  abstract getAction(): CarveAction;
+  abstract getAction(): string;
   abstract getButtonDOM(): string;
 
   protected getButtonStyle(): string {

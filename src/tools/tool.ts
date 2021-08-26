@@ -8,6 +8,20 @@ import { EditorHost } from '../editor-host.js';
 export class Tool {
   constructor(protected host: EditorHost) {}
 
+  // Override these.
+  getActions(): string[] { return []; }
+  getDescription(): string { return null; }
+}
+
+/** A tool that fires one action (like Open File). */
+export class SimpleActionTool extends Tool {
+  // Override this.
+  async onDo() {}
+}
+
+/** A tool that lets the user interact with the Document in the work area (like Rectangle). */
+export class ModeTool extends Tool {
+  // Override these.
   onMouseDown(evt: CarveMouseEvent) {}
   onMouseMove(evt: CarveMouseEvent) {}
   onMouseUp(evt: CarveMouseEvent) {}

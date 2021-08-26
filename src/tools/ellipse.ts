@@ -1,20 +1,16 @@
 import { EditorHost } from '../editor-host.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
-import { Tool } from './tool.js';
+import { ModeTool } from './tool.js';
 import { InsertElementCommand } from '../commands/insert-element-command.js';
 import { CarveMouseEvent } from '../carve-mouse-event.js';
 
 /** A tool for drawing an ellipse. */
-export class EllipseTool extends Tool {
+export class EllipseTool extends ModeTool {
   private isDrawing: boolean = false;
   private startPoint: Point;
   private endPoint: Point;
   private drawingElem: SVGEllipseElement;
-
-  constructor(host: EditorHost) {
-    super(host);
-  }
 
   onMouseDown(evt: CarveMouseEvent) {
     this.isDrawing = true;
