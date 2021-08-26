@@ -4,6 +4,9 @@ import { SVGNS } from '../constants.js';
 import { ModeTool } from './tool.js';
 import { InsertElementCommand } from '../commands/insert-element-command.js';
 import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { ToolbarModeButton } from '../toolbar-button.js';
+
+export const ACTION_ELLIPSE_MODE = 'ellipse_mode';
 
 /** A tool for drawing an ellipse. */
 export class EllipseTool extends ModeTool {
@@ -11,6 +14,8 @@ export class EllipseTool extends ModeTool {
   private startPoint: Point;
   private endPoint: Point;
   private drawingElem: SVGEllipseElement;
+
+  getActions(): string[] { return [ ACTION_ELLIPSE_MODE ]; }
 
   onMouseDown(evt: CarveMouseEvent) {
     this.isDrawing = true;
@@ -57,10 +62,28 @@ export class EllipseTool extends ModeTool {
     }
   }
 
+  setActive(active: boolean) {
+    // TODO: Fix this so it is not dependent upon the registered tag name.
+    const allButtons = document.querySelectorAll('carve-ellipse-button');
+    for (let b = 0; b < allButtons.length; ++b) {
+      (allButtons.item(b) as EllipseButton).active = true;
+    }
+  }
+
   private cleanUp() {
     this.isDrawing = false;
     this.startPoint = null;
     this.endPoint = null;
     this.drawingElem = null;
+  }
+}
+
+export class EllipseButton extends ToolbarModeButton {
+  getAction(): string { return ACTION_ELLIPSE_MODE; }
+  getButtonDOM(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <title>Ellipse Tool</title>
+      <ellipse cx="50" cy="50" rx="40" ry="20" fill="green" stroke-width="4" stroke="black" />
+    </svg>`;
   }
 }

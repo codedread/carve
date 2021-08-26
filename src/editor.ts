@@ -1,15 +1,11 @@
-import { CarveAction } from './actions.js';
+import { Box } from './math/box.js';
 import { CarveDocument, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
-import { CarveEllipseButton } from './core-toolbar-buttons.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
-import { keyToAction } from './keys.js';
-import { EllipseTool } from './tools/ellipse.js';
-import { Box } from './math/box.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -43,15 +39,9 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   
   private currentModeTool: ModeTool = null;
 
-  // Known tools.
-  private ellipseTool: EllipseTool;
-
   constructor() {
     super();
     this.createShadowDOM();
-
-    // Set up tools.
-    this.ellipseTool = new EllipseTool(this);
 
     // Listen for events.
     window.addEventListener('keyup', this);
@@ -78,13 +68,9 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   }
 
   handleEvent(e: Event) {
-    let action: CarveAction;
-    if (e instanceof KeyboardEvent) {
-      if (this.keyActionRegistry.has(e.key)) {
-        action = this.keyActionRegistry.get(e.key);
-      } else {
-        action = keyToAction(e.key);
-      }
+    let action: string;
+    if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
+      action = this.keyActionRegistry.get(e.key);
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
     } else if (e instanceof MouseEvent && this.currentModeTool) {
@@ -97,22 +83,12 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     if (action) {
-      if (this.toolActionRegistry.has(action)) {
-        const tool = this.toolActionRegistry.get(action);
-        if (tool instanceof SimpleActionTool) {
-          tool.onDo();
-        } else if (tool instanceof ModeTool) {
-          this.currentModeTool = tool;
-          this.currentModeTool.setActive(true);
-        }
-      } else {
-        // Remove all this eventually.
-        switch (action) {
-          case CarveAction.ELLIPSE_MODE:
-            (this.querySelector('carve-ellipse-button') as CarveEllipseButton).active = true;
-            this.currentModeTool = this.ellipseTool;
-            break;
-        }
+      const tool = this.toolActionRegistry.get(action);
+      if (tool instanceof SimpleActionTool) {
+        tool.onDo();
+      } else if (tool instanceof ModeTool) {
+        this.currentModeTool = tool;
+        this.currentModeTool.setActive(true);
       }
     }
   }

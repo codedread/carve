@@ -65,6 +65,7 @@ export class RectangleTool extends ModeTool {
     }
   }
 
+  // TODO: Fix this so it is not dependent upon the registered tag name.
   setActive(active: boolean) {
     const allButtons = document.querySelectorAll('carve-rectangle-button');
     for (let b = 0; b < allButtons.length; ++b) {
