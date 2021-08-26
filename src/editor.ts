@@ -1,10 +1,9 @@
 import { CarveAction } from './actions.js';
 import { CarveDocument, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
-import { CarveRectangleButton, CarveEllipseButton } from './core-toolbar-buttons.js';
+import { CarveEllipseButton } from './core-toolbar-buttons.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
-import { RectangleTool } from './tools/rectangle.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
@@ -45,7 +44,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   private currentModeTool: ModeTool = null;
 
   // Known tools.
-  private rectTool: RectangleTool;
   private ellipseTool: EllipseTool;
 
   constructor() {
@@ -53,7 +51,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.createShadowDOM();
 
     // Set up tools.
-    this.rectTool = new RectangleTool(this);
     this.ellipseTool = new EllipseTool(this);
 
     // Listen for events.
@@ -83,7 +80,11 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   handleEvent(e: Event) {
     let action: CarveAction;
     if (e instanceof KeyboardEvent) {
-      action = keyToAction(e.key);
+      if (this.keyActionRegistry.has(e.key)) {
+        action = this.keyActionRegistry.get(e.key);
+      } else {
+        action = keyToAction(e.key);
+      }
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
     } else if (e instanceof MouseEvent && this.currentModeTool) {
@@ -102,14 +103,11 @@ export class CarveEditor extends HTMLElement implements EditorHost {
           tool.onDo();
         } else if (tool instanceof ModeTool) {
           this.currentModeTool = tool;
+          this.currentModeTool.setActive(true);
         }
       } else {
         // Remove all this eventually.
         switch (action) {
-          case CarveAction.RECTANGLE_MODE:
-            (this.querySelector('carve-rectangle-button') as CarveRectangleButton).active = true;
-            this.currentModeTool = this.rectTool;
-            break;
           case CarveAction.ELLIPSE_MODE:
             (this.querySelector('carve-ellipse-button') as CarveEllipseButton).active = true;
             this.currentModeTool = this.ellipseTool;

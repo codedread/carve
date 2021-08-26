@@ -25,4 +25,5 @@ export class ModeTool extends Tool {
   onMouseDown(evt: CarveMouseEvent) {}
   onMouseMove(evt: CarveMouseEvent) {}
   onMouseUp(evt: CarveMouseEvent) {}
+  setActive(active: boolean) {}
 }

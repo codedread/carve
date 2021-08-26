@@ -1,9 +1,11 @@
-import { EditorHost } from '../editor-host.js';
+import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
-import { ModeTool } from './tool.js';
-import { InsertElementCommand } from '../commands/insert-element-command.js';
-import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { ToolbarModeButton } from '../toolbar-button.js';
+
+export const ACTION_RECTANGLE_MODE = 'rectangle_mode';
 
 /** A tool for drawing a rectangle. */
 export class RectangleTool extends ModeTool {
@@ -11,6 +13,8 @@ export class RectangleTool extends ModeTool {
   private startPoint: Point;
   private endPoint: Point;
   private drawingElem: SVGRectElement;
+
+  getActions(): string[] { return [ ACTION_RECTANGLE_MODE ]; }
 
   onMouseDown(evt: CarveMouseEvent) {
     this.isDrawing = true;
@@ -61,10 +65,27 @@ export class RectangleTool extends ModeTool {
     }
   }
 
+  setActive(active: boolean) {
+    const allButtons = document.querySelectorAll('carve-rectangle-button');
+    for (let b = 0; b < allButtons.length; ++b) {
+      (allButtons.item(b) as RectangleButton).active = true;
+    }
+  }
+
   private cleanUp() {
     this.isDrawing = false;
     this.startPoint = null;
     this.endPoint = null;
     this.drawingElem = null;
+  }
+}
+
+export class RectangleButton extends ToolbarModeButton {
+  getAction(): string { return ACTION_RECTANGLE_MODE; }
+  getButtonDOM(): string {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <title>Rectangle Tool</title>
+      <rect x="15" y="30" width="70" height="40" fill="red" stroke-width="4" stroke="black" />
+    </svg>`;
   }
 }

@@ -3,11 +3,11 @@ import { ToolbarButton } from '../toolbar-button.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
 
-const MY_ACTION = 'open_document';
+export const ACTION_OPEN_DOCUMENT = 'open_document';
 
 /** A tool that opens a document from a file. */
 export class FileOpenTool extends SimpleActionTool {
-  getActions(): string[] { return [ MY_ACTION ]; }
+  getActions(): string[] { return [ ACTION_OPEN_DOCUMENT ]; }
 
   async onDo() {
     if (window['showOpenFilePicker']) {
@@ -32,7 +32,7 @@ export class FileOpenTool extends SimpleActionTool {
 }
 
 export class FileOpenButton extends ToolbarButton {
-  getAction(): string { return MY_ACTION; }
+  getAction(): string { return ACTION_OPEN_DOCUMENT; }
   getButtonDOM(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <title>Open Document</title>

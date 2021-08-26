@@ -5,8 +5,6 @@
  * later make the editor extensible.
  */
 export const CarveAction = {
-  // Drawing Actions.
-  RECTANGLE_MODE: 'rectangle_mode',
   ELLIPSE_MODE: 'ellipse_mode',
 }
 

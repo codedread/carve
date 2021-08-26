@@ -2,11 +2,11 @@ import { createNewDocument } from '../document.js';
 import { ToolbarButton } from '../toolbar-button.js';
 import { SimpleActionTool } from './tool.js'
 
-const MY_ACTION = 'new_document';
+export const ACTION_NEW_DOCUMENT = 'new_document';
 
 /** A tool that opens a new document. */
 export class FileNewTool extends SimpleActionTool {
-  getActions(): string[] { return [ MY_ACTION ]; }
+  getActions(): string[] { return [ ACTION_NEW_DOCUMENT ]; }
 
   async onDo() {
     this.host.switchDocument(await createNewDocument());
@@ -14,7 +14,7 @@ export class FileNewTool extends SimpleActionTool {
 }
 
 export class FileNewButton extends ToolbarButton {
-  getAction(): string { return MY_ACTION; }
+  getAction(): string { return ACTION_NEW_DOCUMENT; }
   getButtonDOM(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <title>New Document</title>
