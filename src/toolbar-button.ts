@@ -1,9 +1,9 @@
-export const TOOLBAR_CLICKED_TYPE = 'toolbar-clicked';
+export const TOOLBAR_BUTTON_CLICKED_EVENT_TYPE = 'carve-toolbar-button-clicked';
 
 /** Event for when the toolbar button is clicked. */
 export class ToolbarClickedEvent extends Event {
   constructor(public action: string) {
-    super(TOOLBAR_CLICKED_TYPE, { bubbles: true });
+    super(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, { bubbles: true });
   }
 }
 

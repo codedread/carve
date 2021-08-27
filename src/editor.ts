@@ -3,9 +3,10 @@ import { CarveDocument, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
+import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
-import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
+import { ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -38,6 +39,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   private keyActionRegistry: Map<string, string> = new Map();
   
   private currentModeTool: ModeTool = null;
+  private currentSelection: Selection = new Selection();
 
   constructor() {
     super();
@@ -45,7 +47,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
     // Listen for events.
     window.addEventListener('keyup', this);
-    this.addEventListener(TOOLBAR_CLICKED_TYPE, this);
+    this.addEventListener(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, this);
+    this.currentSelection.addEventListener(SELECTION_EVENT_TYPE, this);
     this.workArea.addEventListener('mousedown', this);
     this.workArea.addEventListener('mousemove', this);
     this.workArea.addEventListener('mouseup', this);
@@ -67,12 +70,19 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     return this.overlayElem;
   }
 
+  getSelection(): Selection {
+    return this.currentSelection;
+  }
+
   handleEvent(e: Event) {
+    // Some events trigger an action.
     let action: string;
     if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
       action = this.keyActionRegistry.get(e.key);
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
+    } else if (e instanceof SelectionEvent) {
+      // TODO: This is a change in editor state.
     } else if (e instanceof MouseEvent && this.currentModeTool) {
       const cme = this.toCarveMouseEvent(e);
       switch (e.type) {
@@ -87,6 +97,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       if (tool instanceof SimpleActionTool) {
         tool.onDo();
       } else if (tool instanceof ModeTool) {
+        // TODO: This is a potential change to editor state.
         this.currentModeTool = tool;
         this.currentModeTool.setActive(true);
       }
@@ -121,10 +132,15 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
-  /** Switches the current document of the Editor to a new document. */
+  /**
+   * Switches the current document of the Editor to a new document. It releases the current
+   * document, which should be garbage-collected.
+   */
   switchDocument(doc: CarveDocument) {
     if (doc !== this.currentDoc) {
+      // TODO: These are changes in editor state.
       this.currentDoc = doc;
+      this.currentSelection.clear();
 
       // Clear out previous SVG doc.
       while (this.topSVGElem.hasChildNodes()) {
