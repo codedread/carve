@@ -7,14 +7,17 @@ import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tool
 
 const editor = document.querySelector('carve-editor') as CarveEditor;
 
-editor.registerTool(FileNewTool, {'carve-new-button': { ctor: FileNewButton }});
-editor.registerTool(FileOpenTool, {'carve-open-button': { ctor: FileOpenButton }})
-editor.registerTool(SimpleSelectTool, {'carve-select-button': { ctor: SimpleSelectButton }});
-editor.registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton }});
-editor.registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton }});
+editor
+  // Register all tools and their UI elements.
+  .registerTool(FileNewTool, { 'carve-new-button': { ctor: FileNewButton } })
+  .registerTool(FileOpenTool, { 'carve-open-button': { ctor: FileOpenButton } })
+  .registerTool(SimpleSelectTool, {'carve-select-button': { ctor: SimpleSelectButton }})
+  .registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton }})
+  .registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton }})
 
-editor.registerKeyBinding('e', ACTION_ELLIPSE_MODE);
-editor.registerKeyBinding('n', ACTION_NEW_DOCUMENT);
-editor.registerKeyBinding('o', ACTION_OPEN_DOCUMENT);
-editor.registerKeyBinding('r', ACTION_RECTANGLE_MODE);
-editor.registerKeyBinding('s', ACTION_SELECT_MODE);
+  // Register key bindings, mapping them to actions.
+  .registerKeyBinding('e', ACTION_ELLIPSE_MODE)
+  .registerKeyBinding('n', ACTION_NEW_DOCUMENT)
+  .registerKeyBinding('o', ACTION_OPEN_DOCUMENT)
+  .registerKeyBinding('r', ACTION_RECTANGLE_MODE)
+  .registerKeyBinding('s', ACTION_SELECT_MODE);

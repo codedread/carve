@@ -137,7 +137,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   }
 
   /** Registers an Action with the Editor by its keystroke. */
-  registerKeyBinding(key: string, action: string) {
+  registerKeyBinding(key: string, action: string): CarveEditor {
     if (!this.toolActionRegistry.has(action)) {
       throw `Key binding attempted for action '${action} without a registered tool.`;
     }
@@ -147,14 +147,15 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     this.keyActionRegistry.set(key, action);
+    return this;
   }
 
   /**
    * Registers a tool with the Editor by its actions. Also registers any custom elements in the
-   * custom elements map.
+   * custom elements map, binding them to the tool.
    */
   registerTool(ctor: typeof Tool,
-               customElementsMap: {[tagName: string]: ActionElementConfig} = null) {
+               customElementsMap: {[tagName: string]: ActionElementConfig} = null): CarveEditor {
     const tool = new ctor(this);
     for (const action of tool.getActions()) {
       this.registerToolForAction(action, tool);
@@ -166,6 +167,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
         constructor() { super(tool); }
       });
     }
+    return this;
   }
 
   /**
