@@ -103,7 +103,7 @@ export class CarveEditor extends HTMLElement {
             console.log(`Editor translated an event into an Action: '${action}'`);
             const tool = this.toolActionRegistry.get(action);
             console.log(`Editor resolved action to tool '${tool.constructor.name}'`);
-            if (tool && tool.isEnabled()) {
+            if (tool && !tool.isDisabled()) {
                 if (tool instanceof SimpleActionTool) {
                     tool.onDo();
                 }
@@ -128,10 +128,11 @@ export class CarveEditor extends HTMLElement {
             throw `Key binding for '${key}' already bound to action '${action}'`;
         }
         this.keyActionRegistry.set(key, action);
+        return this;
     }
     /**
      * Registers a tool with the Editor by its actions. Also registers any custom elements in the
-     * custom elements map.
+     * custom elements map, binding them to the tool.
      */
     registerTool(ctor, customElementsMap = null) {
         const tool = new ctor(this);
@@ -145,6 +146,7 @@ export class CarveEditor extends HTMLElement {
                 constructor() { super(tool); }
             });
         }
+        return this;
     }
     /**
      * Switches the current document of the Editor to a new document. It releases the current
