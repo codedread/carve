@@ -1,12 +1,11 @@
-import { CarveAction } from './actions.js';
-import { createDocumentFromFile, createNewDocument } from './document.js';
-import { CarveMouseEvent } from './carve-mouse-event.js';
-import { RectangleTool } from './tools/rectangle.js';
-import { SVGNS } from './constants.js';
-import { ToolbarClickedEvent, TOOLBAR_CLICKED_TYPE } from './toolbar-button.js';
-import { keyToAction } from './keys.js';
-import { EllipseTool } from './tools/ellipse.js';
 import { Box } from './math/box.js';
+import { createNewDocument } from './document.js';
+import { CarveMouseEvent } from './carve-mouse-event.js';
+import { Point } from './math/point.js';
+import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
+import { SVGNS } from './constants.js';
+import { ModeTool, SimpleActionTool } from './tools/tool.js';
+import { ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
 const CARVE_BACKGROUND = 'carveBackground';
@@ -16,21 +15,20 @@ const CARVE_OVERLAY = 'carveOverlay';
 const L = 0.9;
 /** The margin on either side of the canvas. */
 const M = (1 - L) / 2;
-/**
- * A CarveEditor can open a CarveDocument into the work area.
- */
+/** A CarveEditor can open a CarveDocument into the work area. */
 export class CarveEditor extends HTMLElement {
     constructor() {
         super();
         this.viewBox = new Box();
+        this.toolActionRegistry = new Map();
+        this.keyActionRegistry = new Map();
         this.currentModeTool = null;
+        this.currentSelection = new Selection();
         this.createShadowDOM();
-        // Set up tools.
-        this.rectTool = new RectangleTool(this);
-        this.ellipseTool = new EllipseTool(this);
         // Listen for events.
         window.addEventListener('keyup', this);
-        this.addEventListener(TOOLBAR_CLICKED_TYPE, this);
+        this.addEventListener(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, this);
+        this.currentSelection.addEventListener(SELECTION_EVENT_TYPE, this);
         this.workArea.addEventListener('mousedown', this);
         this.workArea.addEventListener('mousemove', this);
         this.workArea.addEventListener('mouseup', this);
@@ -47,13 +45,45 @@ export class CarveEditor extends HTMLElement {
     getOverlay() {
         return this.overlayElem;
     }
+    getSelection() {
+        return this.currentSelection;
+    }
+    getSelectionBBox() {
+        const topLeft = new Point(Infinity, Infinity);
+        const bottomRight = new Point(-Infinity, -Infinity);
+        for (const elem of this.currentSelection.elements()) {
+            const bbox = elem.getBBox();
+            const pts = [
+                new Point(bbox.x, bbox.y),
+                new Point(bbox.x + bbox.width, bbox.y),
+                new Point(bbox.x + bbox.width, bbox.y + bbox.height),
+                new Point(bbox.x, bbox.y + bbox.height),
+            ];
+            for (const pt of pts) {
+                if (pt.x < topLeft.x)
+                    topLeft.x = pt.x;
+                if (pt.y < topLeft.y)
+                    topLeft.y = pt.y;
+                if (pt.x > bottomRight.x)
+                    bottomRight.x = pt.x;
+                if (pt.y > bottomRight.y)
+                    bottomRight.y = pt.y;
+            }
+        }
+        return new Box(topLeft.x, topLeft.y, (bottomRight.x - topLeft.x), (bottomRight.y - topLeft.y));
+    }
     handleEvent(e) {
+        // Some events trigger an action.
         let action;
-        if (e instanceof KeyboardEvent) {
-            action = keyToAction(e.key);
+        if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
+            action = this.keyActionRegistry.get(e.key);
         }
         else if (e instanceof ToolbarClickedEvent) {
             action = e.action;
+        }
+        else if (e instanceof SelectionEvent) {
+            // TODO: This is a change in editor state.
+            console.log(`Editor received a SelectionEvent`);
         }
         else if (e instanceof MouseEvent && this.currentModeTool) {
             const cme = this.toCarveMouseEvent(e);
@@ -70,22 +100,82 @@ export class CarveEditor extends HTMLElement {
             }
         }
         if (action) {
-            switch (action) {
-                case CarveAction.NEW_DOCUMENT:
-                    this.doNewDoc();
-                    break;
-                case CarveAction.OPEN_DOCUMENT:
-                    this.doOpenDoc();
-                    break;
-                case CarveAction.RECTANGLE_MODE:
-                    this.querySelector('carve-rectangle-button').active = true;
-                    this.currentModeTool = this.rectTool;
-                    break;
-                case CarveAction.ELLIPSE_MODE:
-                    this.querySelector('carve-ellipse-button').active = true;
-                    this.currentModeTool = this.ellipseTool;
-                    break;
+            console.log(`Editor translated an event into an Action: '${action}'`);
+            const tool = this.toolActionRegistry.get(action);
+            console.log(`Editor resolved action to tool '${tool.constructor.name}'`);
+            if (tool && tool.isEnabled()) {
+                if (tool instanceof SimpleActionTool) {
+                    tool.onDo();
+                }
+                else if (tool instanceof ModeTool) {
+                    if (this.currentModeTool !== tool) {
+                        if (this.currentModeTool) {
+                            this.currentModeTool.setActive(false);
+                        }
+                        this.currentModeTool = tool;
+                        this.currentModeTool.setActive(true);
+                    }
+                }
             }
+        }
+    }
+    /** Registers an Action with the Editor by its keystroke. */
+    registerKeyBinding(key, action) {
+        if (!this.toolActionRegistry.has(action)) {
+            throw `Key binding attempted for action '${action} without a registered tool.`;
+        }
+        if (this.keyActionRegistry.has(key)) {
+            throw `Key binding for '${key}' already bound to action '${action}'`;
+        }
+        this.keyActionRegistry.set(key, action);
+    }
+    /**
+     * Registers a tool with the Editor by its actions. Also registers any custom elements in the
+     * custom elements map.
+     */
+    registerTool(ctor, customElementsMap = null) {
+        const tool = new ctor(this);
+        for (const action of tool.getActions()) {
+            this.registerToolForAction(action, tool);
+        }
+        for (const [tagName, config] of Object.entries(customElementsMap)) {
+            // Register an anonymous class that extends the passed-in constructor but encloses the
+            // tool so that the UI element has a reference to the tool and can subscribe to its events.
+            customElements.define(tagName, class extends config.ctor {
+                constructor() { super(tool); }
+            });
+        }
+    }
+    /**
+     * Switches the current document of the Editor to a new document. It releases the current
+     * document, which should be garbage-collected.
+     */
+    switchDocument(doc) {
+        if (doc !== this.currentDoc) {
+            // TODO: These are changes in editor state.
+            this.currentDoc = doc;
+            this.currentSelection.clear();
+            // Clear out previous SVG doc and the overlay layer.
+            while (this.topSVGElem.hasChildNodes()) {
+                this.topSVGElem.removeChild(this.topSVGElem.firstChild);
+            }
+            this.overlayElem.innerHTML = '';
+            const svgDom = this.currentDoc.getSVG();
+            this.topSVGElem.appendChild(svgDom);
+            if (svgDom.hasAttribute('viewBox')) {
+                const vbArray = svgDom.getAttribute('viewBox').split(' ');
+                if (vbArray.length !== 4) {
+                    console.error(`Cannot handle this viewBox: ${svgDom.getAttribute('viewBox')}`);
+                }
+                this.viewBox.x = parseFloat(vbArray[0]);
+                this.viewBox.y = parseFloat(vbArray[1]);
+                this.viewBox.w = parseFloat(vbArray[2]);
+                this.viewBox.h = parseFloat(vbArray[3]);
+            }
+            else {
+                console.error(`cannot handle an SVG image without a viewBox yet`);
+            }
+            this.resizeWorkArea();
         }
     }
     createShadowDOM() {
@@ -126,60 +216,18 @@ export class CarveEditor extends HTMLElement {
         this.topSVGElem = this.shadowRoot.querySelector(`#${CARVE_IMAGE}`);
         this.overlayElem = this.shadowRoot.querySelector(`#${CARVE_OVERLAY}`);
     }
-    async doNewDoc() {
-        this.switchDocument(await createNewDocument());
-    }
-    async doOpenDoc() {
-        if (window['showOpenFilePicker']) {
-            try {
-                const handleArray = await window['showOpenFilePicker']({
-                    multiple: false,
-                    types: [
-                        {
-                            description: 'SVG files',
-                            // Add svgz to the accept extensions?
-                            accept: { 'image/svg+xml': ['.svg'] },
-                        },
-                    ],
-                });
-                this.switchDocument(await createDocumentFromFile(handleArray[0]));
-            }
-            catch (err) {
-                alert(err);
-            }
+    /** Registers a tool to handle a given action. */
+    registerToolForAction(action, tool) {
+        if (this.toolActionRegistry.has(action)) {
+            throw `Already registered a tool to handle action '${action}`;
         }
-        // Else, do the old file picker input thing.
+        this.toolActionRegistry.set(action, tool);
     }
     resizeWorkArea() {
         const vbstr = this.viewBox.toString();
         this.backgroundElem.setAttribute('viewBox', vbstr);
         this.topSVGElem.setAttribute('viewBox', vbstr);
         this.overlayElem.setAttribute('viewBox', vbstr);
-    }
-    switchDocument(doc) {
-        if (doc !== this.currentDoc) {
-            this.currentDoc = doc;
-            // Clear out previous SVG doc.
-            while (this.topSVGElem.hasChildNodes()) {
-                this.topSVGElem.removeChild(this.topSVGElem.firstChild);
-            }
-            const svgDom = this.currentDoc.getSVG();
-            this.topSVGElem.appendChild(svgDom);
-            if (svgDom.hasAttribute('viewBox')) {
-                const vbArray = svgDom.getAttribute('viewBox').split(' ');
-                if (vbArray.length !== 4) {
-                    console.error(`Cannot handle this viewBox: ${svgDom.getAttribute('viewBox')}`);
-                }
-                this.viewBox.x = parseFloat(vbArray[0]);
-                this.viewBox.y = parseFloat(vbArray[1]);
-                this.viewBox.w = parseFloat(vbArray[2]);
-                this.viewBox.h = parseFloat(vbArray[3]);
-            }
-            else {
-                console.error(`cannot handle an SVG image without a viewBox yet`);
-            }
-            this.resizeWorkArea();
-        }
     }
     toCarveMouseEvent(mouseEvent) {
         const vbw = this.viewBox.w;
@@ -229,4 +277,5 @@ export class CarveEditor extends HTMLElement {
         return new CarveMouseEvent(carveX, carveY, carveMoveX, carveMoveY, mouseEvent);
     }
 }
+customElements.define('carve-editor', CarveEditor);
 //# sourceMappingURL=editor.js.map

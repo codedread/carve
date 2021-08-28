@@ -1,13 +1,16 @@
+import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
-import { Tool } from './tool.js';
-import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ToolbarModeButton } from '../toolbar-button.js';
+export const ACTION_RECTANGLE_MODE = 'rectangle_mode';
 /** A tool for drawing a rectangle. */
-export class RectangleTool extends Tool {
-    constructor(host) {
-        super(host);
+export class RectangleTool extends ModeTool {
+    constructor() {
+        super(...arguments);
         this.isDrawing = false;
     }
+    getActions() { return [ACTION_RECTANGLE_MODE]; }
     onMouseDown(evt) {
         this.isDrawing = true;
         this.startPoint = new Point(evt.carveX, evt.carveY);
@@ -26,7 +29,7 @@ export class RectangleTool extends Tool {
         if (this.isDrawing) {
             this.isDrawing = false;
             this.endPoint = new Point(evt.carveX, evt.carveY);
-            // Do not create a rect if it would be zero width/height.
+            // Do not create shape if it would be zero width/height.
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
                 this.host.execute(new InsertElementCommand(this.drawingElem));
                 console.log(`RectangleTool: Created a rectangle`);
@@ -54,6 +57,15 @@ export class RectangleTool extends Tool {
         this.startPoint = null;
         this.endPoint = null;
         this.drawingElem = null;
+    }
+}
+export class RectangleButton extends ToolbarModeButton {
+    getAction() { return ACTION_RECTANGLE_MODE; }
+    getButtonDOM() {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <title>Rectangle Tool</title>
+      <rect x="15" y="30" width="70" height="40" fill="red" stroke-width="4" stroke="black" />
+    </svg>`;
     }
 }
 //# sourceMappingURL=rectangle.js.map

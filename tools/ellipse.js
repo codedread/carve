@@ -1,13 +1,16 @@
+import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
-import { Tool } from './tool.js';
-import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ToolbarModeButton } from '../toolbar-button.js';
+export const ACTION_ELLIPSE_MODE = 'ellipse_mode';
 /** A tool for drawing an ellipse. */
-export class EllipseTool extends Tool {
-    constructor(host) {
-        super(host);
+export class EllipseTool extends ModeTool {
+    constructor() {
+        super(...arguments);
         this.isDrawing = false;
     }
+    getActions() { return [ACTION_ELLIPSE_MODE]; }
     onMouseDown(evt) {
         this.isDrawing = true;
         this.startPoint = new Point(evt.carveX, evt.carveY);
@@ -26,7 +29,7 @@ export class EllipseTool extends Tool {
         if (this.isDrawing) {
             this.isDrawing = false;
             this.endPoint = new Point(evt.carveX, evt.carveY);
-            // Do not create a rect if it would be zero width/height.
+            // Do not create shape if it would be zero width/height.
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
                 this.host.execute(new InsertElementCommand(this.drawingElem));
                 console.log(`EllipseTool: Created an ellipse`);
@@ -52,6 +55,15 @@ export class EllipseTool extends Tool {
         this.startPoint = null;
         this.endPoint = null;
         this.drawingElem = null;
+    }
+}
+export class EllipseButton extends ToolbarModeButton {
+    getAction() { return ACTION_ELLIPSE_MODE; }
+    getButtonDOM() {
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <title>Ellipse Tool</title>
+      <ellipse cx="50" cy="50" rx="40" ry="20" fill="green" stroke-width="4" stroke="black" />
+    </svg>`;
     }
 }
 //# sourceMappingURL=ellipse.js.map

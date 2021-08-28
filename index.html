@@ -6,12 +6,14 @@
     <link rel="icon" type="image/png" href="images/logo.svg" sizes="300x300" />
     <link rel="apple-touch-icon" href="images/logo.svg" />
     <link rel="stylesheet" type="text/css" href="carve.css" />
-    <script type="module" src="carve.js"></script>
+    <script type="module" src="editor.js"></script>
+    <script type="module" src="register-tools.js"></script>
   </head>
   <body>
     <carve-editor>
       <carve-new-button slot="toolbar"></carve-new-button>
       <carve-open-button slot="toolbar"></carve-open-button>
+      <carve-select-button slot="toolbar"></carve-select-button>
       <carve-rectangle-button slot="toolbar"></carve-rectangle-button>
       <carve-ellipse-button slot="toolbar"></carve-ellipse-button>
     </carve-editor>

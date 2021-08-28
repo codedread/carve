@@ -1,18 +1,23 @@
-export const TOOLBAR_CLICKED_TYPE = 'toolbar-clicked';
+import { ToolStateChangedEvent, TOOL_STATE_CHANGED_EVENT_TYPE } from './tools/tool.js';
+export const TOOLBAR_BUTTON_CLICKED_EVENT_TYPE = 'carve-toolbar-button-clicked';
 /** Event for when the toolbar button is clicked. */
 export class ToolbarClickedEvent extends Event {
     constructor(action) {
-        super(TOOLBAR_CLICKED_TYPE, { bubbles: true });
+        super(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, { bubbles: true });
         this.action = action;
     }
 }
 /** A super-type for a toolbar button that can be clicked. */
 export class ToolbarButton extends HTMLElement {
-    constructor() {
+    constructor(tool) {
         super();
+        this.tool = tool;
     }
+    // Subclasses need to implement these.
+    getAction() { throw `No getAction() impl in ToolbarButton sub-class`; }
+    getButtonDOM() { throw `No getButtonDom() impl in ToolbarButton sub-class`; }
     getButtonStyle() {
-        return `button {
+        return `button.tool-bar-button {
       background-color: lightgrey;
       border-style: outset;
       border-width: 1px;
@@ -21,7 +26,7 @@ export class ToolbarButton extends HTMLElement {
       padding: 0;
       width: 3em;
     }
-    button:active {
+    button.tool-bar-button:active {
       background-color: #c5c5c5;
       border-style: inset;
     }`;
@@ -38,29 +43,20 @@ export class ToolbarButton extends HTMLElement {
     render() {
         this.attachShadow({ mode: 'open' }).innerHTML =
             `<style>${this.getButtonStyle()}</style>
-        <button>${this.getButtonDOM()}</button>`;
+        <button class="tool-bar-button">${this.getButtonDOM()}</button>`;
     }
 }
 /** A toolbar button that can be "active". Only one ToolbarModeButton can  be active at a time. */
 export class ToolbarModeButton extends ToolbarButton {
-    constructor() {
-        super();
-        // Add all mode buttons to a static list.
-        if (!ToolbarModeButton.allModeButtons.includes(this)) {
-            ToolbarModeButton.allModeButtons.push(this);
-        }
+    constructor(tool) {
+        super(tool);
+        tool.addEventListener(TOOL_STATE_CHANGED_EVENT_TYPE, this);
     }
     /** Reflect DOM attributes with JS state. */
     get active() { return this.hasAttribute('active'); }
     set active(val) {
         if (val) {
             this.setAttribute('active', '');
-            // Loop over all other buttons and set their active to false.
-            for (const modeButton of ToolbarModeButton.allModeButtons) {
-                if (modeButton !== this) {
-                    modeButton.active = false;
-                }
-            }
         }
         else {
             this.removeAttribute('active');
@@ -74,10 +70,16 @@ export class ToolbarModeButton extends ToolbarButton {
     ${super.getButtonStyle()}`;
     }
     handleEvent(evt) {
-        super.handleEvent(evt);
-        // A click activates this button.
-        this.active = true;
+        if (evt instanceof ToolStateChangedEvent) {
+            if (this.active !== evt.newState.active) {
+                this.active = evt.newState.active;
+            }
+            // TODO: enabled.
+        }
+        else {
+            // Let base class handle mouse events.
+            super.handleEvent(evt);
+        }
     }
 }
-ToolbarModeButton.allModeButtons = [];
 //# sourceMappingURL=toolbar-button.js.map
