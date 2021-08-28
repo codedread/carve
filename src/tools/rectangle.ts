@@ -38,7 +38,7 @@ export class RectangleTool extends ModeTool {
       this.isDrawing = false;
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
-      // Do not create a rect if it would be zero width/height.
+      // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
         this.host.execute(new InsertElementCommand(this.drawingElem));
         console.log(`RectangleTool: Created a rectangle`);
@@ -62,14 +62,6 @@ export class RectangleTool extends ModeTool {
           `${(this.endPoint.x < this.startPoint.x) ? this.endPoint.x : this.startPoint.x}`);
       this.drawingElem.setAttribute('y',
           `${(this.endPoint.y < this.startPoint.y) ? this.endPoint.y : this.startPoint.y}`);
-    }
-  }
-
-  // TODO: Fix this so it is not dependent upon the registered tag name.
-  setActive(active: boolean) {
-    const allButtons = document.querySelectorAll('carve-rectangle-button');
-    for (let b = 0; b < allButtons.length; ++b) {
-      (allButtons.item(b) as RectangleButton).active = true;
     }
   }
 

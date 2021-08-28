@@ -1,7 +1,7 @@
 import { createDocumentFromFile } from '../document.js';
-import { ToolbarButton } from '../toolbar-button.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
+import { ToolbarButton } from '../toolbar-button.js';
 
 export const ACTION_OPEN_DOCUMENT = 'open_document';
 

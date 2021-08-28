@@ -1,5 +1,6 @@
 import { Command } from './commands/command.js';
 import { CarveDocument } from './document.js';
+import { Box } from './math/box.js';
 import { Selection } from './selection.js';
 
 /** An interface that CarveEditor implements. It exposes certain methods to Commands/Tools.*/
@@ -15,6 +16,9 @@ export interface EditorHost {
 
   /** Gets the current selection in the editor. */
   getSelection(): Selection;
+
+  /** Gets the bounding box of the current selection in Carve space. */
+  getSelectionBBox(): Box;
 
   /** Switches the current document of the Editor to a new document. */
   switchDocument(doc: CarveDocument);

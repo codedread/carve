@@ -1,9 +1,8 @@
-import { EditorHost } from '../editor-host.js';
+import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { InsertElementCommand } from '../commands/insert-element-command.js';
+import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
-import { ModeTool } from './tool.js';
-import { InsertElementCommand } from '../commands/insert-element-command.js';
-import { CarveMouseEvent } from '../carve-mouse-event.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 
 export const ACTION_ELLIPSE_MODE = 'ellipse_mode';
@@ -39,7 +38,7 @@ export class EllipseTool extends ModeTool {
       this.isDrawing = false;
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
-      // Do not create a rect if it would be zero width/height.
+      // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
         this.host.execute(new InsertElementCommand(this.drawingElem));
         console.log(`EllipseTool: Created an ellipse`);
@@ -59,14 +58,6 @@ export class EllipseTool extends ModeTool {
       this.endPoint.y = evt.carveY;
       this.drawingElem.setAttribute('rx', `${Math.abs(this.endPoint.x - this.startPoint.x)}`);
       this.drawingElem.setAttribute('ry', `${Math.abs(this.endPoint.y - this.startPoint.y)}`);
-    }
-  }
-
-  setActive(active: boolean) {
-    // TODO: Fix this so it is not dependent upon the registered tag name.
-    const allButtons = document.querySelectorAll('carve-ellipse-button');
-    for (let b = 0; b < allButtons.length; ++b) {
-      (allButtons.item(b) as EllipseButton).active = true;
     }
   }
 

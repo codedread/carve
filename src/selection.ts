@@ -14,18 +14,18 @@ export class SelectionEvent extends Event {
 
 /** A stateful class representing a selection of graphical elements in the drawing. */
 export class Selection extends EventTarget {
-  private selectedElements: Element[] = [];
+  private selectedElements: SVGGraphicsElement[] = [];
 
   // Getters.
 
-  elements(): Element[] { return this.selectedElements.slice(); }
-  has(elem: Element) { return this.selectedElements.includes(elem); }
+  elements(): SVGGraphicsElement[] { return this.selectedElements.slice(); }
+  has(elem: SVGGraphicsElement) { return this.selectedElements.includes(elem); }
   isEmpty(): boolean { return this.selectedElements.length === 0; }
   isNonEmpty(): boolean { return this.selectedElements.length > 0; }
   size(): number { return this.selectedElements.length; }
 
   // Mutators.
-  add(elem: Element) {
+  add(elem: SVGGraphicsElement) {
     this.selectedElements.push(elem);
     this.sortIntoDomOrder();
     this.dispatchEvent(new SelectionEvent(this.selectedElements));
@@ -40,7 +40,7 @@ export class Selection extends EventTarget {
   }
 
   /** Returns true if the element was present and removed. False otherweise. */
-  remove(elem: Element): boolean {
+  remove(elem: SVGGraphicsElement): boolean {
     const removeIndex = this.selectedElements.indexOf(elem);
     if (removeIndex !== -1) {
       this.selectedElements.splice(removeIndex, 1);
@@ -51,7 +51,7 @@ export class Selection extends EventTarget {
     return false;
   }
 
-  set(elems: Element[]) {
+  set(elems: SVGGraphicsElement[]) {
     this.selectedElements = [];
     for (const elem of elems) {
       this.selectedElements.push(elem);

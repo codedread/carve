@@ -1,6 +1,6 @@
 import { createNewDocument } from '../document.js';
-import { ToolbarButton } from '../toolbar-button.js';
 import { SimpleActionTool } from './tool.js'
+import { ToolbarButton } from '../toolbar-button.js';
 
 export const ACTION_NEW_DOCUMENT = 'new_document';
 

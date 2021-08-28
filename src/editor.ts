@@ -3,10 +3,11 @@ import { CarveDocument, createNewDocument } from './document.js';
 import { CarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
+import { Point } from './math/point.js';
 import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
-import { ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
+import { ToolbarButton, ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -22,7 +23,7 @@ const M = (1 - L) / 2;
 /** An interface for how to configure the UI custom element. */
 export interface ActionElementConfig {
   /** The constructor for the UI custom element. */
-  ctor: typeof HTMLElement;
+  ctor: typeof ToolbarButton;
 }
 
 /** A CarveEditor can open a CarveDocument into the work area. */
@@ -74,6 +75,28 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     return this.currentSelection;
   }
 
+  getSelectionBBox(): Box {
+    const topLeft = new Point(Infinity, Infinity);
+    const bottomRight = new Point(-Infinity, -Infinity);
+
+    for (const elem of this.currentSelection.elements()) {
+      const bbox = elem.getBBox();
+      const pts = [
+        new Point(bbox.x, bbox.y),
+        new Point(bbox.x + bbox.width, bbox.y),
+        new Point(bbox.x + bbox.width, bbox.y + bbox.height),
+        new Point(bbox.x, bbox.y + bbox.height),
+      ];
+      for (const pt of pts) {
+        if (pt.x < topLeft.x) topLeft.x = pt.x;
+        if (pt.y < topLeft.y) topLeft.y = pt.y;
+        if (pt.x > bottomRight.x) bottomRight.x = pt.x;
+        if (pt.y > bottomRight.y) bottomRight.y = pt.y;
+      }
+    }
+    return new Box(topLeft.x, topLeft.y, (bottomRight.x - topLeft.x), (bottomRight.y - topLeft.y));
+  }
+
   handleEvent(e: Event) {
     // Some events trigger an action.
     let action: string;
@@ -83,6 +106,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       action = e.action;
     } else if (e instanceof SelectionEvent) {
       // TODO: This is a change in editor state.
+      console.log(`Editor received a SelectionEvent`);
     } else if (e instanceof MouseEvent && this.currentModeTool) {
       const cme = this.toCarveMouseEvent(e);
       switch (e.type) {
@@ -93,13 +117,21 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     if (action) {
+      console.log(`Editor translated an event into an Action: '${action}'`);
       const tool = this.toolActionRegistry.get(action);
-      if (tool instanceof SimpleActionTool) {
-        tool.onDo();
-      } else if (tool instanceof ModeTool) {
-        // TODO: This is a potential change to editor state.
-        this.currentModeTool = tool;
-        this.currentModeTool.setActive(true);
+      console.log(`Editor resolved action to tool '${tool.constructor.name}'`);
+      if (tool && tool.isEnabled()) {
+        if (tool instanceof SimpleActionTool) {
+          tool.onDo();
+        } else if (tool instanceof ModeTool) {
+          if (this.currentModeTool !== tool) {
+            if (this.currentModeTool) {
+              this.currentModeTool.setActive(false);
+            }
+            this.currentModeTool = tool;
+            this.currentModeTool.setActive(true);
+          }
+        }
       }
     }
   }
@@ -128,7 +160,11 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       this.registerToolForAction(action, tool);
     }
     for (const [tagName, config] of Object.entries(customElementsMap)) {
-      customElements.define(tagName, config.ctor);
+      // Register an anonymous class that extends the passed-in constructor but encloses the
+      // tool so that the UI element has a reference to the tool and can subscribe to its events.
+      customElements.define(tagName, class extends config.ctor {
+        constructor() { super(tool); }
+      });
     }
   }
 
@@ -142,10 +178,12 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       this.currentDoc = doc;
       this.currentSelection.clear();
 
-      // Clear out previous SVG doc.
+      // Clear out previous SVG doc and the overlay layer.
       while (this.topSVGElem.hasChildNodes()) {
         this.topSVGElem.removeChild(this.topSVGElem.firstChild);
       }
+      this.overlayElem.innerHTML = '';
+
       const svgDom = this.currentDoc.getSVG();
       this.topSVGElem.appendChild(svgDom);
       if (svgDom.hasAttribute('viewBox')) {
