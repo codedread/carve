@@ -39,6 +39,7 @@ export class SimpleSelectTool extends ModeTool {
       selectorBoxEl.setAttribute('width', `${bbox.w}`);
       selectorBoxEl.setAttribute('height', `${bbox.h}`);
     } else {
+      this.host.getSelection().clear();
       this.host.getOverlay().innerHTML = '';
     }
     this.mousedDownElem = null;

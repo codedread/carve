@@ -1,4 +1,4 @@
-import { Tool, ToolStateChangedEvent, TOOL_STATE_CHANGED_EVENT_TYPE } from './tools/tool.js';
+import { Tool, ToolState, ToolStateChangedEvent, TOOL_STATE_CHANGED_EVENT_TYPE } from './tools/tool.js';
 
 export const TOOLBAR_BUTTON_CLICKED_EVENT_TYPE = 'carve-toolbar-button-clicked';
 
@@ -13,6 +13,8 @@ export class ToolbarClickedEvent extends Event {
 export class ToolbarButton extends HTMLElement {
   constructor(protected tool: Tool) {
     super();
+    this.disabled = tool.getState().disabled;
+    tool.addEventListener(TOOL_STATE_CHANGED_EVENT_TYPE, this);
   }
 
   // Subclasses need to implement these.
@@ -32,6 +34,11 @@ export class ToolbarButton extends HTMLElement {
     button.tool-bar-button:active {
       background-color: #c5c5c5;
       border-style: inset;
+    }
+    button.tool-bar-button:disabled {
+      background-color: lightgrey;
+      border-style: outset;
+      opacity: 0.5;
     }`;
   }
 
@@ -40,16 +47,46 @@ export class ToolbarButton extends HTMLElement {
     this.addEventListener('click', this);
   }
 
+  get disabled(): boolean { return this.hasAttribute('disabled'); }
+  set disabled(val: boolean) {
+    const buttonEl = this.shadowRoot && this.shadowRoot.querySelector('button.tool-bar-button');
+    if (val) {
+      this.setAttribute('disabled', '');
+      if (buttonEl) {
+        buttonEl.setAttribute('disabled', '');
+      }
+    } else {
+      this.removeAttribute('disabled')
+      if (buttonEl) {
+        buttonEl.removeAttribute('disabled');
+      }
+    }
+  }
+
   handleEvent(evt: Event) {
-    if (evt.type === 'click') {
-      this.dispatchEvent(new ToolbarClickedEvent(this.getAction()));
+    if (evt instanceof ToolStateChangedEvent) {
+      if (this.disabled !== evt.newState.disabled) {
+        this.disabled = evt.newState.disabled;
+      }
+    } else if (evt.type === 'click') {
+      if (!this.disabled) {
+        this.dispatchEvent(new ToolbarClickedEvent(this.getAction()));
+      } else {
+        evt.stopPropagation();
+        evt.preventDefault();
+      }
     }
   }
 
   render() {
+    let buttonTag = `<button class="tool-bar-button"`;
+    if (this.tool.isDisabled()) {
+       buttonTag += ` disabled`;
+    }
+    buttonTag += `>${this.getButtonDOM()}</button>`;
     this.attachShadow({mode: 'open'}).innerHTML =
         `<style>${this.getButtonStyle()}</style>
-        <button class="tool-bar-button">${this.getButtonDOM()}</button>`;
+        ${buttonTag}`;
   }
 }
 
@@ -57,7 +94,7 @@ export class ToolbarButton extends HTMLElement {
 export abstract class ToolbarModeButton extends ToolbarButton {
   constructor(tool: Tool) {
     super(tool);
-    tool.addEventListener(TOOL_STATE_CHANGED_EVENT_TYPE, this);
+    this.active = tool.getState().active;
   }
 
   /** Reflect DOM attributes with JS state. */
@@ -71,7 +108,7 @@ export abstract class ToolbarModeButton extends ToolbarButton {
   }
 
   protected getButtonStyle(): string {
-    return `:host([active]) button {
+    return `:host([active]) button:enabled {
       background-color: darkgrey;
       border-style: inset;
     }
@@ -83,10 +120,8 @@ export abstract class ToolbarModeButton extends ToolbarButton {
       if (this.active !== evt.newState.active) {
         this.active = evt.newState.active;
       }
-      // TODO: enabled.
-    } else {
-      // Let base class handle mouse events.
-      super.handleEvent(evt);
     }
+    // Let base class handle mouse events.
+    super.handleEvent(evt);
   }
 }

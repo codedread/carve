@@ -120,7 +120,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       console.log(`Editor translated an event into an Action: '${action}'`);
       const tool = this.toolActionRegistry.get(action);
       console.log(`Editor resolved action to tool '${tool.constructor.name}'`);
-      if (tool && tool.isEnabled()) {
+      if (tool && !tool.isDisabled()) {
         if (tool instanceof SimpleActionTool) {
           tool.onDo();
         } else if (tool instanceof ModeTool) {

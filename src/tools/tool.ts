@@ -4,8 +4,8 @@ import { EditorHost } from '../editor-host.js';
 export interface ToolState {
   /** Whether the tool is active right now. */
   active: boolean;
-  /** Whether the tool is enabled right now. */
-  enabled: boolean;
+  /** Whether the tool is disabled right now. */
+  disabled: boolean;
 }
 
 export const TOOL_STATE_CHANGED_EVENT_TYPE = 'carve-tool-state-changed';
@@ -20,21 +20,31 @@ export class ToolStateChangedEvent extends Event {
  * Base class for the implementation of a tool (rectangle, etc).
  */
 export class Tool extends EventTarget {
-  protected state: ToolState = {
-    active: false,
-    enabled: true,
-  };
+  protected state: ToolState;
 
-  constructor(protected host: EditorHost) {
+  constructor(protected host: EditorHost, state: ToolState = {
+    active: false,
+    disabled: false,
+  }) {
     super();
+    this.state = {...state};
   }
 
   // Override these.
   getActions(): string[] { throw `No actions for tool ${this.constructor.name}`; }
   getDescription(): string { return null; }
+  getState(): ToolState { return {...this.state}; }
 
   isActive(): boolean { return this.state.active; }
-  isEnabled(): boolean { return this.state.enabled; }
+  isDisabled(): boolean { return this.state.disabled; }
+
+  setDisabled(disabled: boolean) {
+    if (this.state.disabled !== disabled) {
+      console.log(`Tool '${this.constructor.name}' is becoming ${disabled ? 'disabled' : 'enabled'}`);
+      this.state.disabled = disabled;
+      this.dispatchEvent(new ToolStateChangedEvent({...this.state}));
+    }
+  }
 }
 
 /** A tool that fires one action (like Open File). */
@@ -54,7 +64,7 @@ export class ModeTool extends Tool {
   onMouseUp(evt: CarveMouseEvent) {}
   setActive(active: boolean) {
     if (this.state.active !== active) {
-      console.log(`Tool '${this.constructor.name}' becoming ${active ? 'active' : 'inactive'}`);
+      console.log(`Tool '${this.constructor.name}' is becoming ${active ? 'active' : 'inactive'}`);
       this.state.active = active;
       this.dispatchEvent(new ToolStateChangedEvent({...this.state}));
     }
