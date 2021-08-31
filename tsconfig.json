@@ -1,6 +1,9 @@
 {
   "include": [
-      "src/**/*",
+    "src/**/*",
+  ],
+  "exclude": [
+    "src/**/*.spec.ts",
   ],
   "compilerOptions": {
     "lib": [
