@@ -8,7 +8,6 @@ export const SELECTION_EVENT_TYPE = 'carve-selection';
 export class SelectionEvent extends Event {
   constructor(public selectedElements: Element[]) {
     super(SELECTION_EVENT_TYPE);
-
   }
 }
 

@@ -69,4 +69,17 @@ describe('Selection tests', () => {
 
     expect(sel.isEmpty()).is.true;
   });
+
+  it('should be able to set', () => {
+    const sel = new Selection();
+    sel.set([ELEM_1 as any, ELEM_2 as any]);
+
+    expect(sel.elements().length).equals(2);
+
+    const bbox = sel.getBBox();
+    expect(bbox.x).equals(-10);
+    expect(bbox.y).equals(-20);
+    expect(bbox.w).equals(220);
+    expect(bbox.h).equals(140);
+  });
 });
