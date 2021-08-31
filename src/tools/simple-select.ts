@@ -32,7 +32,7 @@ export class SimpleSelectTool extends ModeTool {
         <rect id="selectorBox" fill="none" stroke="#08f" stroke-width="1px" stroke-dasharray="1,1" />
       </g>`;
 
-      const bbox = this.host.getSelectionBBox();
+      const bbox = this.host.getSelection().getBBox();
       const selectorBoxEl = overlay.querySelector('#selectorBox');
       selectorBoxEl.setAttribute('x', `${bbox.x}`);
       selectorBoxEl.setAttribute('y', `${bbox.y}`);

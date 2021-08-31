@@ -75,28 +75,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     return this.currentSelection;
   }
 
-  getSelectionBBox(): Box {
-    const topLeft = new Point(Infinity, Infinity);
-    const bottomRight = new Point(-Infinity, -Infinity);
-
-    for (const elem of this.currentSelection.elements()) {
-      const bbox = elem.getBBox();
-      const pts = [
-        new Point(bbox.x, bbox.y),
-        new Point(bbox.x + bbox.width, bbox.y),
-        new Point(bbox.x + bbox.width, bbox.y + bbox.height),
-        new Point(bbox.x, bbox.y + bbox.height),
-      ];
-      for (const pt of pts) {
-        if (pt.x < topLeft.x) topLeft.x = pt.x;
-        if (pt.y < topLeft.y) topLeft.y = pt.y;
-        if (pt.x > bottomRight.x) bottomRight.x = pt.x;
-        if (pt.y > bottomRight.y) bottomRight.y = pt.y;
-      }
-    }
-    return new Box(topLeft.x, topLeft.y, (bottomRight.x - topLeft.x), (bottomRight.y - topLeft.y));
-  }
-
   handleEvent(e: Event) {
     // Some events trigger an action.
     let action: string;

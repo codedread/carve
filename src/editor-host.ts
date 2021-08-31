@@ -17,9 +17,6 @@ export interface EditorHost {
   /** Gets the current selection in the editor. */
   getSelection(): Selection;
 
-  /** Gets the bounding box of the current selection in Carve space. */
-  getSelectionBBox(): Box;
-
   /** Switches the current document of the Editor to a new document. */
   switchDocument(doc: CarveDocument);
 }
