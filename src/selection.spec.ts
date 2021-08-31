@@ -59,5 +59,14 @@ describe('Selection tests', () => {
     expect(bbox.y).equals(-20);
     expect(bbox.w).equals(30);
     expect(bbox.h).equals(40);
-  })
+  });
+
+  it('should be able to clear', () => {
+    const sel = new Selection();
+    sel.add(ELEM_1 as any);
+    sel.add(ELEM_2 as any);
+    sel.clear();
+
+    expect(sel.isEmpty()).is.true;
+  });
 });
