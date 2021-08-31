@@ -1,3 +1,5 @@
+[![Node.js CI](https://github.com/codedread/kthoom/actions/workflows/node.js.yml/badge.svg)](https://github.com/codedread/kthoom/actions/workflows/node.js.yml)
+
 # Carve
 
 ## About
