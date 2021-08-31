@@ -1,10 +1,8 @@
 import { Box } from './math/box.js';
 import { Point } from './math/point.js';
+import { DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_PRECEDING } from './constants.js';
 
 export const SELECTION_EVENT_TYPE = 'carve-selection';
-
-const DOCUMENT_POSITION_PRECEDING = 2;
-const DOCUMENT_POSITION_FOLLOWING = 4;
 
 /** An event indicating some selection has changed. */
 export class SelectionEvent extends Event {

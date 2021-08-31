@@ -2,9 +2,18 @@ import 'mocha';
 import { expect } from 'chai';
 
 import { Selection } from './selection.js';
-import { SVGNS } from './constants.js';
+import { DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_PRECEDING } from './constants.js';
 
 describe('Selection tests', () => {
+  const ELEM_1 = {
+    compareDocumentPosition: () => { return DOCUMENT_POSITION_FOLLOWING; },
+    getBBox: () => { return {x: 10, y: 20, width: 200, height: 100}; },
+  };
+  const ELEM_2 = {
+    compareDocumentPosition: () => { return DOCUMENT_POSITION_PRECEDING; },
+    getBBox: () => { return {x: -10, y: -20, width: 30, height: 40}; },
+  };
+
   it('should handle empty Selections properly.', () => {
     const sel = new Selection();
     expect(sel.isEmpty()).is.true;
@@ -14,7 +23,7 @@ describe('Selection tests', () => {
 
   it('should handle basic bbox', () => {
     const sel = new Selection();
-    sel.add({ getBBox: () => { return {x: 10, y: 20, width: 200, height: 100}; }} as any);
+    sel.add(ELEM_1 as any);
 
     const bbox = sel.getBBox();
     expect(bbox.x).equals(10);
@@ -25,14 +34,10 @@ describe('Selection tests', () => {
 
   it('should handle bbox of more than one element', () => {
     const sel = new Selection();
-    sel.add({
-      compareDocumentPosition: () => {return 2;},
-      getBBox: () => { return {x: 10, y: 20, width: 200, height: 100}; }
-    } as any);
-    sel.add({
-      compareDocumentPosition: () => {return 4;},
-      getBBox: () => { return {x: -10, y: -20, width: 10, height: 10}; }
-    } as any);
+    sel.add(ELEM_1 as any);
+    sel.add(ELEM_2 as any);
+
+    expect(sel.elements().length).equals(2);
 
     const bbox = sel.getBBox();
     expect(bbox.x).equals(-10);
@@ -40,4 +45,19 @@ describe('Selection tests', () => {
     expect(bbox.w).equals(220); // (200 + 10) - (-10)
     expect(bbox.h).equals(140); // (100 + 20) - (-10)
   });
+
+  it('should be able to remove elements from selection', () => {
+    const sel = new Selection();
+    sel.add(ELEM_1 as any);
+    sel.add(ELEM_2 as any);
+    sel.remove(ELEM_1 as any);
+
+    expect(sel.elements().length).equals(1);
+
+    const bbox = sel.getBBox();
+    expect(bbox.x).equals(-10);
+    expect(bbox.y).equals(-20);
+    expect(bbox.w).equals(30);
+    expect(bbox.h).equals(40);
+  })
 });
