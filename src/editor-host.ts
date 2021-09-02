@@ -5,6 +5,10 @@ import { Selection } from './selection.js';
 
 /** An interface that CarveEditor implements. It exposes certain methods to Commands/Tools.*/
 export interface EditorHost {
+  /** Adds an event listener to the EditorHost. */
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject,
+      opts?: boolean|AddEventListenerOptions);
+
   /** Executes the given command on the current document. */
   execute(cmd: Command);
 
@@ -19,4 +23,7 @@ export interface EditorHost {
 
   /** Switches the current document of the Editor to a new document. */
   switchDocument(doc: CarveDocument);
+
+  /** Un-applies the most recent command on the current document. */
+  unexecute();
 }

@@ -1,7 +1,8 @@
 import { Box } from './math/box.js';
 import { CarveDocument, createNewDocument } from './document.js';
-import { CarveMouseEvent, toCarveMouseEvent } from './carve-mouse-event.js';
+import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
+import { CommandStateChangedEvent } from './history.js';
 import { EditorHost } from './editor-host.js';
 import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
@@ -60,6 +61,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   execute(cmd: Command) {
     cmd.apply(this);
     this.currentDoc.addCommandToStack(cmd);
+    this.dispatchEvent(new CommandStateChangedEvent(
+        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
   }
 
   getImage(): SVGSVGElement {
@@ -182,6 +185,16 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       }
 
       this.resizeWorkArea();
+    }
+  }
+
+  unexecute() {
+    const cmdIndex = this.currentDoc.getCommandIndex();
+    if (cmdIndex > 0) {
+      const cmdToUndo = this.currentDoc.rewindCommand();
+      cmdToUndo.unapply(this);
+      this.dispatchEvent(new CommandStateChangedEvent(
+        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
     }
   }
 

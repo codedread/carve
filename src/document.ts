@@ -26,13 +26,42 @@ export class CarveDocument {
     }
   }
 
+  /** Adds the command to the document's stack and increments the command index. */
   addCommandToStack(cmd: Command) {
+    // Blow away all commands at the index and beyond.
+    if (this.commandIndex < this.commandHistory.length) {
+      this.commandHistory = this.commandHistory.slice(0, this.commandIndex);
+    }
+
     this.commandHistory.push(cmd);
     this.commandIndex = this.commandHistory.length;
   }
 
+  getCommandIndex(): number { return this.commandIndex; }
+  getCommandStackLength(): number { return this.commandHistory.length; }
   getSVG(): SVGSVGElement {
     return this.svgElem;
+  }
+
+  /**
+   * Increments the command index if the command stack has been rewound and returns the command
+   * just re-applied.
+   */
+  redoCommand(): Command {
+    if (this.commandIndex < this.commandHistory.length) {
+      this.commandIndex = this.commandIndex + 1;
+      return this.commandHistory[this.commandIndex - 1];
+    }
+    return null;
+  }
+
+  /** Decrements the command index if there are any commands and returns the command just rewound. */
+  rewindCommand(): Command {
+    if (this.commandIndex > 0) {
+      this.commandIndex = this.commandIndex - 1;
+      return this.commandHistory[this.commandIndex];
+    }
+    return null;
   }
 }
 
