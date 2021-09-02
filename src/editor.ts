@@ -1,9 +1,8 @@
 import { Box } from './math/box.js';
 import { CarveDocument, createNewDocument } from './document.js';
-import { CarveMouseEvent } from './carve-mouse-event.js';
+import { CarveMouseEvent, toCarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
 import { EditorHost } from './editor-host.js';
-import { Point } from './math/point.js';
 import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
@@ -86,7 +85,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       // TODO: This is a change in editor state.
       console.log(`Editor received a SelectionEvent`);
     } else if (e instanceof MouseEvent && this.currentModeTool) {
-      const cme = this.toCarveMouseEvent(e);
+      const cme = toCarveMouseEvent(e, this.viewBox,
+          parseInt(window.getComputedStyle(this.workArea)['width'], 10),
+          parseInt(window.getComputedStyle(this.workArea)['height'], 10),
+          L, M);
       switch (e.type) {
         case 'mousedown': this.currentModeTool.onMouseDown(cme); break;
         case 'mousemove': this.currentModeTool.onMouseMove(cme); break;
@@ -238,60 +240,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.overlayElem.setAttribute('viewBox', vbstr);
   }
 
-  private toCarveMouseEvent(mouseEvent: MouseEvent): CarveMouseEvent {
-    const vbw = this.viewBox.w;
-    const vbh = this.viewBox.h;
-
-    let [carveX, carveY, carveMoveX, carveMoveY] = [0, 0, 0, 0];
-    // Fractional coordinates (0.0 represents the left-most or top-most, 1.0 for right/bottom).
-    let [fx, fy] = [0.0, 0.0];
-
-    let x = mouseEvent.offsetX;
-    let y = mouseEvent.offsetY;
-    // Work area width and height.
-    const waw = parseInt(window.getComputedStyle(this.workArea)['width'], 10);
-    const wah = parseInt(window.getComputedStyle(this.workArea)['height'], 10);
-    if (waw > wah) {
-      // The window is wider than it is tall, therefore the height is 100% and the canvas is
-      // centered width-wise with some padding on left/right.
-
-      fy = (y - (wah * M)) / (wah * L);
-      const diffW = (waw - wah) / 2;
-      fx = (x - diffW - (wah * M)) / (wah * L);
-
-      // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
-      carveMoveX = this.viewBox.w * mouseEvent.movementX / (wah * L);
-      carveMoveY = this.viewBox.h * mouseEvent.movementY / (wah * L);
-    } else {
-      // The window is taller than it is wide, therefore the width is 100% and the canvas is
-      // centered height-wise with some padding on top/bottom.
-
-      fx = (x - (waw * M)) / (waw * L);
-      const diffH = (wah - waw) / 2;
-      fy = (y - diffH - (waw * M)) / (waw * L);
-
-      // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
-      carveMoveX = this.viewBox.w * mouseEvent.movementX / (waw * L);
-      carveMoveY = this.viewBox.h * mouseEvent.movementY / (waw * L);
-    }
-
-    // If the viewBox is not perfectly square, we need to "spread" either the x or the y coordinate
-    // across the space to reach the bounds.
-    if (this.viewBox.w < this.viewBox.h) {
-      const slope = vbh / vbw;
-      const yIntercept = -0.5 * (slope - 1);
-      fx = slope * fx + yIntercept;
-    } else if (this.viewBox.h < this.viewBox.w) {
-      const slope = vbw / vbh;
-      const yIntercept = -0.5 * (slope - 1);
-      fy = slope * fy + yIntercept;
-    }
-
-    carveX = this.viewBox.w * fx + this.viewBox.x;
-    carveY = this.viewBox.h * fy + this.viewBox.y;
-
-    return new CarveMouseEvent(carveX, carveY, carveMoveX, carveMoveY, mouseEvent);
-  }
 }
 
 customElements.define('carve-editor', CarveEditor);
