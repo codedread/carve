@@ -39,11 +39,11 @@ export class RectangleTool extends ModeTool {
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
       // Do not create shape if it would be zero width/height.
+      const rectElem = this.drawingElem.parentElement.removeChild(this.drawingElem);
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-        this.host.execute(new InsertElementCommand(this.drawingElem));
+        this.host.execute(new InsertElementCommand(rectElem));
         console.log(`RectangleTool: Created a rectangle`);
       } else {
-        this.drawingElem.parentElement.removeChild(this.drawingElem);
         console.log(`RectangleTool: Abandoned creating a rectangle`);
       }
 

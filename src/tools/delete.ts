@@ -1,8 +1,8 @@
-import { SimpleActionTool } from './tool.js'
-import { ToolbarButton } from '../toolbar-button.js';
+import { DeleteElementsCommand } from '../commands/delete-elements-command.js';
 import { EditorHost } from '../editor-host.js';
 import { SelectionEvent, SELECTION_EVENT_TYPE } from '../selection.js';
-import { DeleteElementsCommand } from '../commands/delete-elements-command.js';
+import { SimpleActionTool } from './tool.js'
+import { ToolbarButton } from '../toolbar-button.js';
 
 export const ACTION_DELETE = 'delete_selection';
 

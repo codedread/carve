@@ -38,12 +38,12 @@ export class EllipseTool extends ModeTool {
       this.isDrawing = false;
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
+      const ellipseEl = this.drawingElem.parentElement.removeChild(this.drawingElem);
       // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-        this.host.execute(new InsertElementCommand(this.drawingElem));
+        this.host.execute(new InsertElementCommand(ellipseEl));
         console.log(`EllipseTool: Created an ellipse`);
       } else {
-        this.drawingElem.parentElement.removeChild(this.drawingElem);
         console.log(`EllipseTool: Abandoned creating an ellipse`);
       }
 
