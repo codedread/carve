@@ -10,16 +10,12 @@ export const ACTION_DELETE = 'delete_selection';
 export class DeleteTool extends SimpleActionTool {
   constructor(host: EditorHost) {
     super(host, { active: false, disabled: true});
-    this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, this);
+    this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt: SelectionEvent) => {
+      this.setDisabled(evt.selectedElements.length === 0);
+    });
   }
 
   getActions(): string[] { return [ ACTION_DELETE ]; }
-
-  handleEvent(evt: Event) {
-    if (evt instanceof SelectionEvent) {
-      this.setDisabled(evt.selectedElements.length === 0);
-    }
-  }
 
   async onDo() {
     const selection = this.host.getSelection();
