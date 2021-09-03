@@ -21,6 +21,8 @@ export class UndoTool extends SimpleActionTool {
   }
 
   async onDo() {
+    // TODO: Unit test that this is called.
+    this.host.getSelection().clear();
     this.host.unexecute();
   }
 }

@@ -41,6 +41,8 @@ export class RectangleTool extends ModeTool {
       // Do not create shape if it would be zero width/height.
       const rectElem = this.drawingElem.parentElement.removeChild(this.drawingElem);
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
+        // TODO: Unit test that this is called.
+        this.host.getSelection().clear();
         this.host.execute(new InsertElementCommand(rectElem));
         console.log(`RectangleTool: Created a rectangle`);
       } else {

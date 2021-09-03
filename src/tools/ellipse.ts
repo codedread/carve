@@ -41,6 +41,8 @@ export class EllipseTool extends ModeTool {
       const ellipseEl = this.drawingElem.parentElement.removeChild(this.drawingElem);
       // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
+        // TODO: Unit test that this is called.
+        this.host.getSelection().clear();
         this.host.execute(new InsertElementCommand(ellipseEl));
         console.log(`EllipseTool: Created an ellipse`);
       } else {
