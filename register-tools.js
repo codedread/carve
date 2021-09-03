@@ -3,13 +3,17 @@ import { ACTION_ELLIPSE_MODE, EllipseButton, EllipseTool } from './tools/ellipse
 import { ACTION_NEW_DOCUMENT, FileNewButton, FileNewTool } from './tools/file-new.js';
 import { ACTION_OPEN_DOCUMENT, FileOpenButton, FileOpenTool } from './tools/file-open.js';
 import { ACTION_RECTANGLE_MODE, RectangleButton, RectangleTool } from './tools/rectangle.js';
+import { ACTION_REDO, RedoButton, RedoTool } from './tools/redo.js';
 import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tools/simple-select.js';
+import { ACTION_UNDO, UndoButton, UndoTool } from './tools/undo.js';
 const editor = document.querySelector('carve-editor');
 editor
     // Register all tools and their UI elements.
     .registerTool(FileNewTool, { 'carve-new-button': { ctor: FileNewButton } })
     .registerTool(FileOpenTool, { 'carve-open-button': { ctor: FileOpenButton } })
     .registerTool(SimpleSelectTool, { 'carve-select-button': { ctor: SimpleSelectButton } })
+    .registerTool(UndoTool, { 'carve-undo-button': { ctor: UndoButton } })
+    .registerTool(RedoTool, { 'carve-redo-button': { ctor: RedoButton } })
     .registerTool(DeleteTool, { 'carve-delete-button': { ctor: DeleteButton } })
     .registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton } })
     .registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton } })
@@ -19,5 +23,7 @@ editor
     .registerKeyBinding('o', ACTION_OPEN_DOCUMENT)
     .registerKeyBinding('r', ACTION_RECTANGLE_MODE)
     .registerKeyBinding('s', ACTION_SELECT_MODE)
+    .registerKeyBinding('z', ACTION_UNDO)
+    .registerKeyBinding('y', ACTION_REDO)
     .registerKeyBinding('Delete', ACTION_DELETE);
 //# sourceMappingURL=register-tools.js.map

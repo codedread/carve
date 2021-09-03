@@ -1,5 +1,6 @@
 export const TOOL_STATE_CHANGED_EVENT_TYPE = 'carve-tool-state-changed';
 export class ToolStateChangedEvent extends Event {
+    newState;
     constructor(newState) {
         super(TOOL_STATE_CHANGED_EVENT_TYPE);
         this.newState = newState;
@@ -9,6 +10,8 @@ export class ToolStateChangedEvent extends Event {
  * Base class for the implementation of a tool (rectangle, etc).
  */
 export class Tool extends EventTarget {
+    host;
+    state;
     constructor(host, state = {
         active: false,
         disabled: false,

@@ -2,6 +2,9 @@
  * A command used to delete DOM elements from the image.
  */
 export class DeleteElementsCommand {
+    elem;
+    parentElem;
+    nextSiblingElem;
     constructor(elem) {
         this.elem = elem;
         this.parentElem = elem.parentElement;

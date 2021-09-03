@@ -2,10 +2,7 @@ import { ModeTool } from './tool.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 export const ACTION_SELECT_MODE = 'select_mode';
 export class SimpleSelectTool extends ModeTool {
-    constructor() {
-        super(...arguments);
-        this.mousedDownElem = null;
-    }
+    mousedDownElem = null;
     getActions() { return [ACTION_SELECT_MODE]; }
     onMouseDown(evt) {
         const image = this.host.getImage();
@@ -27,7 +24,7 @@ export class SimpleSelectTool extends ModeTool {
             overlay.innerHTML = `<g id="selectorGroup">
         <rect id="selectorBox" fill="none" stroke="#08f" stroke-width="1px" stroke-dasharray="1,1" />
       </g>`;
-            const bbox = this.host.getSelectionBBox();
+            const bbox = this.host.getSelection().getBBox();
             const selectorBoxEl = overlay.querySelector('#selectorBox');
             selectorBoxEl.setAttribute('x', `${bbox.x}`);
             selectorBoxEl.setAttribute('y', `${bbox.y}`);

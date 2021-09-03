@@ -2,6 +2,7 @@ import { ToolStateChangedEvent, TOOL_STATE_CHANGED_EVENT_TYPE } from './tools/to
 export const TOOLBAR_BUTTON_CLICKED_EVENT_TYPE = 'carve-toolbar-button-clicked';
 /** Event for when the toolbar button is clicked. */
 export class ToolbarClickedEvent extends Event {
+    action;
     constructor(action) {
         super(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, { bubbles: true });
         this.action = action;
@@ -9,6 +10,7 @@ export class ToolbarClickedEvent extends Event {
 }
 /** A super-type for a toolbar button that can be clicked. */
 export class ToolbarButton extends HTMLElement {
+    tool;
     constructor(tool) {
         super();
         this.tool = tool;

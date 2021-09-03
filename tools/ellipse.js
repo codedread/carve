@@ -6,10 +6,10 @@ import { ToolbarModeButton } from '../toolbar-button.js';
 export const ACTION_ELLIPSE_MODE = 'ellipse_mode';
 /** A tool for drawing an ellipse. */
 export class EllipseTool extends ModeTool {
-    constructor() {
-        super(...arguments);
-        this.isDrawing = false;
-    }
+    isDrawing = false;
+    startPoint;
+    endPoint;
+    drawingElem;
     getActions() { return [ACTION_ELLIPSE_MODE]; }
     onMouseDown(evt) {
         this.isDrawing = true;
@@ -29,13 +29,15 @@ export class EllipseTool extends ModeTool {
         if (this.isDrawing) {
             this.isDrawing = false;
             this.endPoint = new Point(evt.carveX, evt.carveY);
+            const ellipseEl = this.drawingElem.parentElement.removeChild(this.drawingElem);
             // Do not create shape if it would be zero width/height.
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-                this.host.execute(new InsertElementCommand(this.drawingElem));
+                // TODO: Unit test that this is called.
+                this.host.getSelection().clear();
+                this.host.execute(new InsertElementCommand(ellipseEl));
                 console.log(`EllipseTool: Created an ellipse`);
             }
             else {
-                this.drawingElem.parentElement.removeChild(this.drawingElem);
                 console.log(`EllipseTool: Abandoned creating an ellipse`);
             }
             this.host.getOverlay().innerHTML = '';

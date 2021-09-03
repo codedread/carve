@@ -6,10 +6,10 @@ import { ToolbarModeButton } from '../toolbar-button.js';
 export const ACTION_RECTANGLE_MODE = 'rectangle_mode';
 /** A tool for drawing a rectangle. */
 export class RectangleTool extends ModeTool {
-    constructor() {
-        super(...arguments);
-        this.isDrawing = false;
-    }
+    isDrawing = false;
+    startPoint;
+    endPoint;
+    drawingElem;
     getActions() { return [ACTION_RECTANGLE_MODE]; }
     onMouseDown(evt) {
         this.isDrawing = true;
@@ -30,12 +30,14 @@ export class RectangleTool extends ModeTool {
             this.isDrawing = false;
             this.endPoint = new Point(evt.carveX, evt.carveY);
             // Do not create shape if it would be zero width/height.
+            const rectElem = this.drawingElem.parentElement.removeChild(this.drawingElem);
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-                this.host.execute(new InsertElementCommand(this.drawingElem));
+                // TODO: Unit test that this is called.
+                this.host.getSelection().clear();
+                this.host.execute(new InsertElementCommand(rectElem));
                 console.log(`RectangleTool: Created a rectangle`);
             }
             else {
-                this.drawingElem.parentElement.removeChild(this.drawingElem);
                 console.log(`RectangleTool: Abandoned creating a rectangle`);
             }
             this.host.getOverlay().innerHTML = '';

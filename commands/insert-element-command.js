@@ -3,6 +3,11 @@
  * move the element from one position in the image's DOM to another.
  */
 export class InsertElementCommand {
+    elem;
+    newParent;
+    newNextElementSibling;
+    oldParent;
+    oldNextElementSibling;
     constructor(elem, newParent, newNextElementSibling) {
         this.elem = elem;
         this.newParent = newParent;

@@ -1,7 +1,7 @@
 import { Box } from './math/box.js';
 import { createNewDocument } from './document.js';
-import { CarveMouseEvent } from './carve-mouse-event.js';
-import { Point } from './math/point.js';
+import { toCarveMouseEvent } from './carve-mouse-event.js';
+import { CommandStateChangedEvent } from './history.js';
 import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
 import { ModeTool, SimpleActionTool } from './tools/tool.js';
@@ -17,13 +17,18 @@ const L = 0.9;
 const M = (1 - L) / 2;
 /** A CarveEditor can open a CarveDocument into the work area. */
 export class CarveEditor extends HTMLElement {
+    currentDoc;
+    workArea;
+    backgroundElem;
+    topSVGElem;
+    overlayElem;
+    viewBox = new Box();
+    toolActionRegistry = new Map();
+    keyActionRegistry = new Map();
+    currentModeTool = null;
+    currentSelection = new Selection();
     constructor() {
         super();
-        this.viewBox = new Box();
-        this.toolActionRegistry = new Map();
-        this.keyActionRegistry = new Map();
-        this.currentModeTool = null;
-        this.currentSelection = new Selection();
         this.createShadowDOM();
         // Listen for events.
         window.addEventListener('keyup', this);
@@ -38,6 +43,7 @@ export class CarveEditor extends HTMLElement {
     execute(cmd) {
         cmd.apply(this);
         this.currentDoc.addCommandToStack(cmd);
+        this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
     }
     getImage() {
         return this.topSVGElem.firstElementChild;
@@ -47,30 +53,6 @@ export class CarveEditor extends HTMLElement {
     }
     getSelection() {
         return this.currentSelection;
-    }
-    getSelectionBBox() {
-        const topLeft = new Point(Infinity, Infinity);
-        const bottomRight = new Point(-Infinity, -Infinity);
-        for (const elem of this.currentSelection.elements()) {
-            const bbox = elem.getBBox();
-            const pts = [
-                new Point(bbox.x, bbox.y),
-                new Point(bbox.x + bbox.width, bbox.y),
-                new Point(bbox.x + bbox.width, bbox.y + bbox.height),
-                new Point(bbox.x, bbox.y + bbox.height),
-            ];
-            for (const pt of pts) {
-                if (pt.x < topLeft.x)
-                    topLeft.x = pt.x;
-                if (pt.y < topLeft.y)
-                    topLeft.y = pt.y;
-                if (pt.x > bottomRight.x)
-                    bottomRight.x = pt.x;
-                if (pt.y > bottomRight.y)
-                    bottomRight.y = pt.y;
-            }
-        }
-        return new Box(topLeft.x, topLeft.y, (bottomRight.x - topLeft.x), (bottomRight.y - topLeft.y));
     }
     handleEvent(e) {
         // Some events trigger an action.
@@ -86,7 +68,7 @@ export class CarveEditor extends HTMLElement {
             console.log(`Editor received a SelectionEvent`);
         }
         else if (e instanceof MouseEvent && this.currentModeTool) {
-            const cme = this.toCarveMouseEvent(e);
+            const cme = toCarveMouseEvent(e, this.viewBox, parseInt(window.getComputedStyle(this.workArea)['width'], 10), parseInt(window.getComputedStyle(this.workArea)['height'], 10), L, M);
             switch (e.type) {
                 case 'mousedown':
                     this.currentModeTool.onMouseDown(cme);
@@ -180,6 +162,22 @@ export class CarveEditor extends HTMLElement {
             this.resizeWorkArea();
         }
     }
+    unexecute() {
+        const cmdIndex = this.currentDoc.getCommandIndex();
+        if (cmdIndex > 0) {
+            const cmdToUndo = this.currentDoc.rewindCommand();
+            cmdToUndo.unapply(this);
+            this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
+        }
+    }
+    reexecute() {
+        const cmdIndex = this.currentDoc.getCommandIndex();
+        if (cmdIndex < this.currentDoc.getCommandStackLength()) {
+            const cmdToRedo = this.currentDoc.redoCommand();
+            cmdToRedo.apply(this);
+            this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
+        }
+    }
     createShadowDOM() {
         const X = M * 100;
         const Y = M * 100;
@@ -230,53 +228,6 @@ export class CarveEditor extends HTMLElement {
         this.backgroundElem.setAttribute('viewBox', vbstr);
         this.topSVGElem.setAttribute('viewBox', vbstr);
         this.overlayElem.setAttribute('viewBox', vbstr);
-    }
-    toCarveMouseEvent(mouseEvent) {
-        const vbw = this.viewBox.w;
-        const vbh = this.viewBox.h;
-        let [carveX, carveY, carveMoveX, carveMoveY] = [0, 0, 0, 0];
-        // Fractional coordinates (0.0 represents the left-most or top-most, 1.0 for right/bottom).
-        let [fx, fy] = [0.0, 0.0];
-        let x = mouseEvent.offsetX;
-        let y = mouseEvent.offsetY;
-        // Work area width and height.
-        const waw = parseInt(window.getComputedStyle(this.workArea)['width'], 10);
-        const wah = parseInt(window.getComputedStyle(this.workArea)['height'], 10);
-        if (waw > wah) {
-            // The window is wider than it is tall, therefore the height is 100% and the canvas is
-            // centered width-wise with some padding on left/right.
-            fy = (y - (wah * M)) / (wah * L);
-            const diffW = (waw - wah) / 2;
-            fx = (x - diffW - (wah * M)) / (wah * L);
-            // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
-            carveMoveX = this.viewBox.w * mouseEvent.movementX / (wah * L);
-            carveMoveY = this.viewBox.h * mouseEvent.movementY / (wah * L);
-        }
-        else {
-            // The window is taller than it is wide, therefore the width is 100% and the canvas is
-            // centered height-wise with some padding on top/bottom.
-            fx = (x - (waw * M)) / (waw * L);
-            const diffH = (wah - waw) / 2;
-            fy = (y - diffH - (waw * M)) / (waw * L);
-            // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
-            carveMoveX = this.viewBox.w * mouseEvent.movementX / (waw * L);
-            carveMoveY = this.viewBox.h * mouseEvent.movementY / (waw * L);
-        }
-        // If the viewBox is not perfectly square, we need to "spread" either the x or the y coordinate
-        // across the space to reach the bounds.
-        if (this.viewBox.w < this.viewBox.h) {
-            const slope = vbh / vbw;
-            const yIntercept = -0.5 * (slope - 1);
-            fx = slope * fx + yIntercept;
-        }
-        else if (this.viewBox.h < this.viewBox.w) {
-            const slope = vbw / vbh;
-            const yIntercept = -0.5 * (slope - 1);
-            fy = slope * fy + yIntercept;
-        }
-        carveX = this.viewBox.w * fx + this.viewBox.x;
-        carveY = this.viewBox.h * fy + this.viewBox.y;
-        return new CarveMouseEvent(carveX, carveY, carveMoveX, carveMoveY, mouseEvent);
     }
 }
 customElements.define('carve-editor', CarveEditor);

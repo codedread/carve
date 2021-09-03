@@ -1,1 +1,1 @@
-{"version":3,"file":"point.js","sourceRoot":"","sources":["../../src/math/point.ts"],"names":[],"mappings":"AAAA,kBAAkB;AAClB,MAAM,OAAO,KAAK;IAChB,YAAmB,IAAY,CAAC,EAAS,IAAY,CAAC;QAAnC,MAAC,GAAD,CAAC,CAAY;QAAS,MAAC,GAAD,CAAC,CAAY;IAAG,CAAC;CAC3D"}
+{"version":3,"file":"point.js","sourceRoot":"","sources":["../../src/math/point.ts"],"names":[],"mappings":"AAAA,kBAAkB;AAClB,MAAM,OAAO,KAAK;IACG;IAAsB;IAAzC,YAAmB,IAAY,CAAC,EAAS,IAAY,CAAC;QAAnC,MAAC,GAAD,CAAC,CAAY;QAAS,MAAC,GAAD,CAAC,CAAY;IAAG,CAAC;CAC3D"}

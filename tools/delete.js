@@ -1,20 +1,17 @@
+import { DeleteElementsCommand } from '../commands/delete-elements-command.js';
+import { SELECTION_EVENT_TYPE } from '../selection.js';
 import { SimpleActionTool } from './tool.js';
 import { ToolbarButton } from '../toolbar-button.js';
-import { SelectionEvent, SELECTION_EVENT_TYPE } from '../selection.js';
-import { DeleteElementsCommand } from '../commands/delete-elements-command.js';
 export const ACTION_DELETE = 'delete_selection';
 /** A tool that deletes the currently selected elements from the document. */
 export class DeleteTool extends SimpleActionTool {
     constructor(host) {
         super(host, { active: false, disabled: true });
-        this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, this);
+        this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt) => {
+            this.setDisabled(evt.selectedElements.length === 0);
+        });
     }
     getActions() { return [ACTION_DELETE]; }
-    handleEvent(evt) {
-        if (evt instanceof SelectionEvent) {
-            this.setDisabled(evt.selectedElements.length === 0);
-        }
-    }
     async onDo() {
         const selection = this.host.getSelection();
         if (selection.size() === 1) {
