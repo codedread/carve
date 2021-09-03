@@ -6,8 +6,7 @@
 
 Playing around with a simple SVG editor web app that has zero runtime dependencies.
 
-This doesn't do much yet, but you can try out [the demo](https://codedread.github.io/carve/) if
-you're curious. It has a couple shape tools, a Select tool, and a Delete button.
+Working towards building a [very basic editor](https://github.com/codedread/carve/projects/1), this demo doesn't do much yet, but you can [try it out](https://codedread.github.io/carve/). It has a couple shape tools, basic selection, delete, undo/redo.
 
 ## Supported Browsers
 
