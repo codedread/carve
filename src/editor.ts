@@ -198,6 +198,16 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
+  reexecute() {
+    const cmdIndex = this.currentDoc.getCommandIndex();
+    if (cmdIndex < this.currentDoc.getCommandStackLength()) {
+      const cmdToRedo = this.currentDoc.redoCommand();
+      cmdToRedo.apply(this);
+      this.dispatchEvent(new CommandStateChangedEvent(
+        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
+    }
+  }
+
   private createShadowDOM() {
     const X = M*100;
     const Y = M*100;

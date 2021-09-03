@@ -26,4 +26,7 @@ export interface EditorHost {
 
   /** Un-applies the most recent command on the current document. */
   unexecute();
+
+  /** Re-applies the most recent command on the current document. */
+  reexecute();
 }
