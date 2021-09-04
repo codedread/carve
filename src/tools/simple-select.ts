@@ -1,6 +1,7 @@
 import { CarveMouseEvent } from '../carve-mouse-event.js';
 import { ModeTool } from './tool.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
+import { Box } from '../math/box.js';
 
 export const ACTION_SELECT_MODE = 'select_mode';
 
@@ -26,10 +27,20 @@ export class SimpleSelectTool extends ModeTool {
     if (mousedUpElem === this.mousedDownElem) {
       this.host.getSelection().set([mousedUpElem]);
 
+      // Figure out the right stroke with based on current image's viewbox.
+      // TODO: Turn this into a method and write some unit tests.
+      const vb = this.host.getImage().getAttribute('viewBox');
+      const box = Box.fromViewBox(vb);
+      const dimension = Math.min(box.w, box.h);
+      let strokeWidth = dimension / 150;
+      let strokeDashArray = dimension / 150;
+
       // Add something to the overlay layer.
       const overlay = this.host.getOverlay();
       overlay.innerHTML = `<g id="selectorGroup">
-        <rect id="selectorBox" fill="none" stroke="#08f" stroke-width="1px" stroke-dasharray="1,1" />
+        <rect id="selectorBox" fill="none" stroke="#08f"
+              stroke-width="${strokeWidth}"
+              stroke-dasharray="${strokeDashArray}" />
       </g>`;
 
       const bbox = this.host.getSelection().getBBox();

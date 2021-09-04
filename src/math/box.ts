@@ -10,4 +10,21 @@ export class Box {
   }
 
   toString(): string { return `${this.x} ${this.y} ${this.w} ${this.h}`; }
+
+  // TODO: Write some unit tests.
+  static fromViewBox(viewBox: string): Box {
+    if (!viewBox) {
+      throw `Must send a string to fromViewBox()`;
+    }
+
+    const vbArray = viewBox.split(' ');
+    if (vbArray.length !== 4) {
+      throw `Cannot handle this viewBox: ${viewBox}`;
+    }
+
+    return new Box(parseFloat(vbArray[0]),
+        parseFloat(vbArray[1]),
+        parseFloat(vbArray[2]),
+        parseFloat(vbArray[3]));
+  }
 }
