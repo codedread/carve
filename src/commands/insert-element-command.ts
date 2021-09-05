@@ -6,12 +6,24 @@ import { EditorHost } from '../editor-host.js';
  * move the element from one position in the image's DOM to another.
  */
 export class InsertElementCommand implements Command {
+  /** The old parent that this element had, if any. */
   private oldParent: SVGElement;
+  /** The old next sibling that this element had, if any. */
   private oldNextElementSibling: SVGElement;
 
-  constructor(private elem: SVGElement,
-    private newParent?: SVGElement,
-    private newNextElementSibling?: SVGElement) {
+  constructor(
+      /** The element to insert or reposition in the image. */
+      private elem: SVGElement,
+      /**
+       * The element's new parent (optional). If not specified, the element is added to the
+       * editor's image.
+       */
+      private newParent?: SVGElement,
+      /**
+       * The element's new next sibling (optional). If not specified, the element is added to the
+       * end of the parent's children.
+       */
+      private newNextElementSibling?: SVGElement) {
     this.oldParent = (elem.parentElement as unknown) as SVGElement;
     this.oldNextElementSibling = (elem.nextElementSibling as unknown) as SVGElement;
   }

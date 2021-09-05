@@ -19,6 +19,7 @@ describe('SimpleSelectTool tests', () => {
 
   const VIEWBOX_WIDTH = 800;
   const VIEWBOX_HEIGHT = 600;
+
   /* The editor image's <svg> element. */
   let fakeImageEl = {
     getAttribute(attrName: string) {

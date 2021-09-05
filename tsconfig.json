@@ -13,6 +13,7 @@
     "module": "esnext",
     "outDir": "dist",
     "sourceMap": true,
-    "target": "esnext"
+    "target": "esnext",
+    "allowSyntheticDefaultImports": true
   }
 }
