@@ -40,13 +40,13 @@ describe('SimpleSelectTool tests', () => {
   /* The EditorHost fake. */
   let fakeEditorHost: EditorHost = {
     addEventListener() {},
+    commandExecute() {},
+    commandReexecute() { },
+    commandUnexecute() { },
     getImage() { return fakeImageEl; },
     getOverlay() { return overlayEl; },
     getSelection() { return selection; },
     switchDocument() { },
-    execute() {},
-    unexecute() { },
-    reexecute() { },
   };
 
   /* Simulates selecting the given element by mousing down, then up. */

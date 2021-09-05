@@ -1,4 +1,4 @@
-import { Command } from './commands/command.js';
+import { CommandStack } from './history.js';
 import { FileSystemFileHandle } from './types/filesystem.js';
 import { SVGDocument } from './types/svg.js';
 
@@ -11,10 +11,8 @@ export class CarveDocument {
   /** The explicit x,y,width,height attributes on the original SVG document. */
   private readonly origDocAttrs = new Map<string, string>();
 
-  /** Any commands lower in the stack than this index have been applied. */
-  private commandIndex: number = 0;
-  /** A stack of all commands in this document's memory. */
-  private commandHistory: Command[] = [];
+  /** The stack of commands for this document (its editor history). */
+  private commandStack: CommandStack = new CommandStack();
 
   constructor(svgEl: SVGSVGElement, private fileHandle?: FileSystemFileHandle) {
     this.svgElem = document.adoptNode(svgEl);
@@ -26,43 +24,11 @@ export class CarveDocument {
     }
   }
 
-  /** Adds the command to the document's stack and increments the command index. */
-  addCommandToStack(cmd: Command) {
-    // Blow away all commands at the index and beyond.
-    if (this.commandIndex < this.commandHistory.length) {
-      this.commandHistory = this.commandHistory.slice(0, this.commandIndex);
-    }
+  /** Returns the command stack of this document. */
+  getCommandStack(): CommandStack { return this.commandStack; }
 
-    this.commandHistory.push(cmd);
-    this.commandIndex = this.commandHistory.length;
-  }
-
-  getCommandIndex(): number { return this.commandIndex; }
-  getCommandStackLength(): number { return this.commandHistory.length; }
-  getSVG(): SVGSVGElement {
-    return this.svgElem;
-  }
-
-  /**
-   * Increments the command index if the command stack has been rewound and returns the command
-   * just re-applied.
-   */
-  redoCommand(): Command {
-    if (this.commandIndex < this.commandHistory.length) {
-      this.commandIndex = this.commandIndex + 1;
-      return this.commandHistory[this.commandIndex - 1];
-    }
-    return null;
-  }
-
-  /** Decrements the command index if there are any commands and returns the command just rewound. */
-  rewindCommand(): Command {
-    if (this.commandIndex > 0) {
-      this.commandIndex = this.commandIndex - 1;
-      return this.commandHistory[this.commandIndex];
-    }
-    return null;
-  }
+  /** Returns the <svg> element of this document. */
+  getSVG(): SVGSVGElement { return this.svgElem; }
 }
 
 

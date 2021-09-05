@@ -5,6 +5,10 @@ import { CommandStateChangedEvent, COMMAND_STATE_CHANGED_EVENT_TYPE } from '../h
 
 export const ACTION_REDO = 'redo';
 
+/**
+ * A tool that re-does the next command. It enables itself if the pointer in the command stack is
+ * not at the bottom of the stack.
+ */
 /** A tool that re-applies the last command. */
 export class RedoTool extends SimpleActionTool {
   constructor(host: EditorHost) {
@@ -17,8 +21,9 @@ export class RedoTool extends SimpleActionTool {
   getActions(): string[] { return [ ACTION_REDO ]; }
 
   async onDo() {
+    // TODO: Unit test that this is called.
     this.host.getSelection().clear();
-    this.host.reexecute();
+    this.host.commandReexecute();
   }
 }
 

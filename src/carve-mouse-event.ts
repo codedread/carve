@@ -1,4 +1,4 @@
-import { Box } from "./math/box";
+import { Box } from './math/box.js';
 
 /** Wrapper of a MouseEvent with Carve-space coordinates */
 export class CarveMouseEvent {

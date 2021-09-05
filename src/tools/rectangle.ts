@@ -43,7 +43,7 @@ export class RectangleTool extends ModeTool {
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
         // TODO: Unit test that this is called.
         this.host.getSelection().clear();
-        this.host.execute(new InsertElementCommand(rectElem));
+        this.host.commandExecute(new InsertElementCommand(rectElem));
         console.log(`RectangleTool: Created a rectangle`);
       } else {
         console.log(`RectangleTool: Abandoned creating a rectangle`);

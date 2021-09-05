@@ -58,11 +58,27 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     createNewDocument().then(doc => this.switchDocument(doc));
   }
 
-  execute(cmd: Command) {
-    cmd.apply(this);
-    this.currentDoc.addCommandToStack(cmd);
-    this.dispatchEvent(new CommandStateChangedEvent(
-        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
+  /** Executes the command and broadcasts that the command stack state has changed. */
+  commandExecute(cmd: Command) {
+    const cmdStack = this.currentDoc.getCommandStack();
+    cmdStack.addCommand(this, cmd);
+    this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+  }
+
+  /** Re-applies the next command and broadcasts that the command stack state has changed. */
+  commandReexecute() {
+    const cmdStack = this.currentDoc.getCommandStack();
+    if (cmdStack.redo(this)) {
+      this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+    }
+  }
+
+  /** Un-applies the last command and broadcasts that the command stack state has changed. */
+  commandUnexecute() {
+    const cmdStack = this.currentDoc.getCommandStack();
+    if (cmdStack.undo(this)) {
+      this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+    }
   }
 
   getImage(): SVGSVGElement {
@@ -178,26 +194,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       }
 
       this.resizeWorkArea();
-    }
-  }
-
-  unexecute() {
-    const cmdIndex = this.currentDoc.getCommandIndex();
-    if (cmdIndex > 0) {
-      const cmdToUndo = this.currentDoc.rewindCommand();
-      cmdToUndo.unapply(this);
-      this.dispatchEvent(new CommandStateChangedEvent(
-        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
-    }
-  }
-
-  reexecute() {
-    const cmdIndex = this.currentDoc.getCommandIndex();
-    if (cmdIndex < this.currentDoc.getCommandStackLength()) {
-      const cmdToRedo = this.currentDoc.redoCommand();
-      cmdToRedo.apply(this);
-      this.dispatchEvent(new CommandStateChangedEvent(
-        this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
     }
   }
 
