@@ -6,6 +6,9 @@ import { Box } from '../math/box.js';
 export const ACTION_SELECT_MODE = 'select_mode';
 
 export class SimpleSelectTool extends ModeTool {
+  /** How wide the stroke of the selector box is. */
+  static readonly SELECTOR_STROKE_SCALE = 1/2;
+
   private mousedDownElem: SVGElement = null;
 
   getActions(): string[] { return [ ACTION_SELECT_MODE ]; }
@@ -32,8 +35,9 @@ export class SimpleSelectTool extends ModeTool {
       const vb = this.host.getImage().getAttribute('viewBox');
       const box = Box.fromViewBoxString(vb);
       const dimension = Math.min(box.w, box.h);
-      let strokeWidth = dimension / 150;
-      let strokeDashArray = dimension / 150;
+      // Default dimension is 100
+      let strokeWidth = (dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
+      let strokeDashArray = (2 * dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
 
       // Add something to the overlay layer.
       const overlay = this.host.getOverlay();
