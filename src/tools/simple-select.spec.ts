@@ -33,6 +33,12 @@ describe('SimpleSelectTool tests', () => {
   /* The element that has been selected by the user within the image. */
   let clickedEl = {
     parentElement: fakeImageEl,
+    getAttribute(attrName: string): string {
+      switch (attrName) {
+        case 'stroke-width': return '4';
+      }
+      return null;
+    },
     getBBox() {
       return { x: 10, y: 20, width: 100, height: 50 };
     },

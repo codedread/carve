@@ -6,12 +6,24 @@ import { DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_PRECEDING } from './cons
 
 describe('Selection tests', () => {
   const ELEM_1 = {
-    compareDocumentPosition: () => { return DOCUMENT_POSITION_FOLLOWING; },
-    getBBox: () => { return {x: 10, y: 20, width: 200, height: 100}; },
+    compareDocumentPosition() { return DOCUMENT_POSITION_FOLLOWING; },
+    getAttribute(attrName: string): string {
+      switch (attrName) {
+        case 'stroke-width': return '4';
+      }
+      return null;
+    },
+    getBBox() { return {x: 10, y: 20, width: 200, height: 100}; },
   };
   const ELEM_2 = {
-    compareDocumentPosition: () => { return DOCUMENT_POSITION_PRECEDING; },
-    getBBox: () => { return {x: -10, y: -20, width: 30, height: 40}; },
+    compareDocumentPosition() { return DOCUMENT_POSITION_PRECEDING; },
+    getAttribute(attrName: string): string {
+      switch (attrName) {
+        case 'stroke-width': return '4';
+      }
+      return null;
+    },
+    getBBox() { return {x: -10, y: -20, width: 30, height: 40}; },
   };
 
   it('should handle empty Selections properly.', () => {
@@ -25,11 +37,12 @@ describe('Selection tests', () => {
     const sel = new Selection();
     sel.add(ELEM_1 as any);
 
+    // Bounding box includes half the stroke width.
     const bbox = sel.getBBox();
-    expect(bbox.x).equals(10);
-    expect(bbox.y).equals(20);
-    expect(bbox.w).equals(200);
-    expect(bbox.h).equals(100);
+    expect(bbox.x).equals(8);
+    expect(bbox.y).equals(18);
+    expect(bbox.w).equals(204);
+    expect(bbox.h).equals(104);
   });
 
   it('should handle bbox of more than one element', () => {
@@ -40,10 +53,10 @@ describe('Selection tests', () => {
     expect(sel.elements().length).equals(2);
 
     const bbox = sel.getBBox();
-    expect(bbox.x).equals(-10);
-    expect(bbox.y).equals(-20);
-    expect(bbox.w).equals(220); // (200 + 10) - (-10)
-    expect(bbox.h).equals(140); // (100 + 20) - (-10)
+    expect(bbox.x).equals(-12);
+    expect(bbox.y).equals(-22);
+    expect(bbox.w).equals(224); // (200 + 10) - (-10) + 4
+    expect(bbox.h).equals(144); // (100 + 20) - (-10) + 4
   });
 
   it('should be able to remove elements from selection', () => {
@@ -55,10 +68,10 @@ describe('Selection tests', () => {
     expect(sel.elements().length).equals(1);
 
     const bbox = sel.getBBox();
-    expect(bbox.x).equals(-10);
-    expect(bbox.y).equals(-20);
-    expect(bbox.w).equals(30);
-    expect(bbox.h).equals(40);
+    expect(bbox.x).equals(-12);
+    expect(bbox.y).equals(-22);
+    expect(bbox.w).equals(34);
+    expect(bbox.h).equals(44);
   });
 
   it('should be able to clear', () => {
@@ -77,9 +90,9 @@ describe('Selection tests', () => {
     expect(sel.elements().length).equals(2);
 
     const bbox = sel.getBBox();
-    expect(bbox.x).equals(-10);
-    expect(bbox.y).equals(-20);
-    expect(bbox.w).equals(220);
-    expect(bbox.h).equals(140);
+    expect(bbox.x).equals(-12);
+    expect(bbox.y).equals(-22);
+    expect(bbox.w).equals(224);
+    expect(bbox.h).equals(144);
   });
 });

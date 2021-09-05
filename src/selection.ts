@@ -33,12 +33,16 @@ export class Selection extends EventTarget {
     const bottomRight = new Point(-Infinity, -Infinity);
 
     for (const elem of this.elements()) {
+      // {stroke: true} might be supported one day
       const bbox = elem.getBBox();
+      // Number(null) or Number('') returns 0. This should always be a number.
+      const strokeWidth = Number(elem.getAttribute('stroke-width'));
+      // Account for half the stroke width in the bounding box.
       const pts = [
-        new Point(bbox.x, bbox.y),
-        new Point(bbox.x + bbox.width, bbox.y),
-        new Point(bbox.x + bbox.width, bbox.y + bbox.height),
-        new Point(bbox.x, bbox.y + bbox.height),
+        new Point(bbox.x - strokeWidth/2, bbox.y - strokeWidth/2),
+        new Point(bbox.x + bbox.width + strokeWidth/2, bbox.y - strokeWidth/2),
+        new Point(bbox.x + bbox.width + strokeWidth/2, bbox.y + bbox.height + strokeWidth/2),
+        new Point(bbox.x - strokeWidth/2, bbox.y + bbox.height + strokeWidth/2),
       ];
       for (const pt of pts) {
         if (pt.x < topLeft.x) topLeft.x = pt.x;
