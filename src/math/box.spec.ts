@@ -1,5 +1,5 @@
 import 'mocha';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { Box } from './box.js';
 
 describe('Box tests', () => {
