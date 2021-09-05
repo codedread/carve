@@ -6,7 +6,7 @@
   "scripts": {
     "copy-files": "copyfiles -u 1 -e \"src/**/*.ts\" src/*.* \"src/**/*.*\" dist",
     "build": "tsc && npm run copy-files",
-    "test": "./node_modules/.bin/mocha --loader=ts-node/esm -r global-jsdom/register src/**/*.spec.ts",
+    "test": "./node_modules/.bin/mocha --loader=ts-node/esm -r global-jsdom/register 'src/**/*.spec.ts'",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "repository": {

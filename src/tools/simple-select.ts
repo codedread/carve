@@ -30,7 +30,7 @@ export class SimpleSelectTool extends ModeTool {
       // Figure out the right stroke with based on current image's viewbox.
       // TODO: Turn this into a method and write some unit tests.
       const vb = this.host.getImage().getAttribute('viewBox');
-      const box = Box.fromViewBox(vb);
+      const box = Box.fromViewBoxString(vb);
       const dimension = Math.min(box.w, box.h);
       let strokeWidth = dimension / 150;
       let strokeDashArray = dimension / 150;

@@ -11,8 +11,7 @@ export class Box {
 
   toString(): string { return `${this.x} ${this.y} ${this.w} ${this.h}`; }
 
-  // TODO: Write some unit tests.
-  static fromViewBox(viewBox: string): Box {
+  static fromViewBoxString(viewBox: string): Box {
     if (!viewBox) {
       throw `Must send a string to fromViewBox()`;
     }
@@ -22,9 +21,14 @@ export class Box {
       throw `Cannot handle this viewBox: ${viewBox}`;
     }
 
-    return new Box(parseFloat(vbArray[0]),
-        parseFloat(vbArray[1]),
-        parseFloat(vbArray[2]),
-        parseFloat(vbArray[3]));
+    const x = Number(vbArray[0]);
+    const y = Number(vbArray[1]);
+    const w = Number(vbArray[2]);
+    const h = Number(vbArray[3]);
+    if (isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)) {
+      throw `Invalid viewBox (not numbers): ${viewBox}`;
+    }
+
+    return new Box(x, y, w, h);
   }
 }

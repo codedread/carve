@@ -172,7 +172,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       const svgDom = this.currentDoc.getSVG();
       this.topSVGElem.appendChild(svgDom);
       if (svgDom.hasAttribute('viewBox')) {
-        this.viewBox = Box.fromViewBox(svgDom.getAttribute('viewBox'));
+        this.viewBox = Box.fromViewBoxString(svgDom.getAttribute('viewBox'));
       } else {
         console.error(`cannot handle an SVG image without a viewBox yet`);
       }
