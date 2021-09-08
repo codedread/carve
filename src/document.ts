@@ -27,6 +27,9 @@ export class CarveDocument {
   /** Returns the command stack of this document. */
   getCommandStack(): CommandStack { return this.commandStack; }
 
+  /** Returns the file system file handle. */
+  getFileHandle(): FileSystemFileHandle { return this.fileHandle; }
+
   /** Returns the <svg> element of this document. */
   getSVG(): SVGSVGElement { return this.svgElem; }
 }
