@@ -34,7 +34,7 @@ export class EllipseTool extends ModeTool {
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
                 // TODO: Unit test that this is called.
                 this.host.getSelection().clear();
-                this.host.execute(new InsertElementCommand(ellipseEl));
+                this.host.commandExecute(new InsertElementCommand(ellipseEl));
                 console.log(`EllipseTool: Created an ellipse`);
             }
             else {

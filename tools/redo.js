@@ -2,6 +2,10 @@ import { SimpleActionTool } from './tool.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 import { COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
 export const ACTION_REDO = 'redo';
+/**
+ * A tool that re-does the next command. It enables itself if the pointer in the command stack is
+ * not at the bottom of the stack.
+ */
 /** A tool that re-applies the last command. */
 export class RedoTool extends SimpleActionTool {
     constructor(host) {
@@ -12,8 +16,9 @@ export class RedoTool extends SimpleActionTool {
     }
     getActions() { return [ACTION_REDO]; }
     async onDo() {
+        // TODO: Unit test that this is called.
         this.host.getSelection().clear();
-        this.host.reexecute();
+        this.host.commandReexecute();
     }
 }
 export class RedoButton extends ToolbarModeButton {

@@ -6,9 +6,23 @@ export class InsertElementCommand {
     elem;
     newParent;
     newNextElementSibling;
+    /** The old parent that this element had, if any. */
     oldParent;
+    /** The old next sibling that this element had, if any. */
     oldNextElementSibling;
-    constructor(elem, newParent, newNextElementSibling) {
+    constructor(
+    /** The element to insert or reposition in the image. */
+    elem, 
+    /**
+     * The element's new parent (optional). If not specified, the element is added to the
+     * editor's image.
+     */
+    newParent, 
+    /**
+     * The element's new next sibling (optional). If not specified, the element is added to the
+     * end of the parent's children.
+     */
+    newNextElementSibling) {
         this.elem = elem;
         this.newParent = newParent;
         this.newNextElementSibling = newNextElementSibling;

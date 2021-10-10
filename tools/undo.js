@@ -2,7 +2,10 @@ import { SimpleActionTool } from './tool.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 import { COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
 export const ACTION_UNDO = 'undo';
-/** A tool that undoes the last command. */
+/**
+ * A tool that undoes the last command. It enables itself if the pointer in the command stack is
+ * not at the top of the stack.
+ */
 export class UndoTool extends SimpleActionTool {
     constructor(host) {
         super(host, { active: false, disabled: true });
@@ -14,7 +17,7 @@ export class UndoTool extends SimpleActionTool {
     async onDo() {
         // TODO: Unit test that this is called.
         this.host.getSelection().clear();
-        this.host.unexecute();
+        this.host.commandUnexecute();
     }
 }
 export class UndoButton extends ToolbarModeButton {

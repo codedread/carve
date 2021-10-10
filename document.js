@@ -1,3 +1,4 @@
+import { CommandStack } from './history.js';
 /**
  * Wraps an SVG document and stores changes to it.
  */
@@ -7,10 +8,8 @@ export class CarveDocument {
     svgElem;
     /** The explicit x,y,width,height attributes on the original SVG document. */
     origDocAttrs = new Map();
-    /** Any commands lower in the stack than this index have been applied. */
-    commandIndex = 0;
-    /** A stack of all commands in this document's memory. */
-    commandHistory = [];
+    /** The stack of commands for this document (its editor history). */
+    commandStack = new CommandStack();
     constructor(svgEl, fileHandle) {
         this.fileHandle = fileHandle;
         this.svgElem = document.adoptNode(svgEl);
@@ -21,39 +20,12 @@ export class CarveDocument {
             }
         }
     }
-    /** Adds the command to the document's stack and increments the command index. */
-    addCommandToStack(cmd) {
-        // Blow away all commands at the index and beyond.
-        if (this.commandIndex < this.commandHistory.length) {
-            this.commandHistory = this.commandHistory.slice(0, this.commandIndex);
-        }
-        this.commandHistory.push(cmd);
-        this.commandIndex = this.commandHistory.length;
-    }
-    getCommandIndex() { return this.commandIndex; }
-    getCommandStackLength() { return this.commandHistory.length; }
-    getSVG() {
-        return this.svgElem;
-    }
-    /**
-     * Increments the command index if the command stack has been rewound and returns the command
-     * just re-applied.
-     */
-    redoCommand() {
-        if (this.commandIndex < this.commandHistory.length) {
-            this.commandIndex = this.commandIndex + 1;
-            return this.commandHistory[this.commandIndex - 1];
-        }
-        return null;
-    }
-    /** Decrements the command index if there are any commands and returns the command just rewound. */
-    rewindCommand() {
-        if (this.commandIndex > 0) {
-            this.commandIndex = this.commandIndex - 1;
-            return this.commandHistory[this.commandIndex];
-        }
-        return null;
-    }
+    /** Returns the command stack of this document. */
+    getCommandStack() { return this.commandStack; }
+    /** Returns the file system file handle. */
+    getFileHandle() { return this.fileHandle; }
+    /** Returns the <svg> element of this document. */
+    getSVG() { return this.svgElem; }
 }
 /** Creates an empty CarveDocument with a blank SVG document. */
 export function createNewDocument() {

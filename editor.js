@@ -40,10 +40,25 @@ export class CarveEditor extends HTMLElement {
         // Create a new doc.
         createNewDocument().then(doc => this.switchDocument(doc));
     }
-    execute(cmd) {
-        cmd.apply(this);
-        this.currentDoc.addCommandToStack(cmd);
-        this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
+    /** Executes the command and broadcasts that the command stack state has changed. */
+    commandExecute(cmd) {
+        const cmdStack = this.currentDoc.getCommandStack();
+        cmdStack.addCommand(this, cmd);
+        this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+    }
+    /** Re-applies the next command and broadcasts that the command stack state has changed. */
+    commandReexecute() {
+        const cmdStack = this.currentDoc.getCommandStack();
+        if (cmdStack.redo(this)) {
+            this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+        }
+    }
+    /** Un-applies the last command and broadcasts that the command stack state has changed. */
+    commandUnexecute() {
+        const cmdStack = this.currentDoc.getCommandStack();
+        if (cmdStack.undo(this)) {
+            this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
+        }
     }
     getImage() {
         return this.topSVGElem.firstElementChild;
@@ -147,35 +162,12 @@ export class CarveEditor extends HTMLElement {
             const svgDom = this.currentDoc.getSVG();
             this.topSVGElem.appendChild(svgDom);
             if (svgDom.hasAttribute('viewBox')) {
-                const vbArray = svgDom.getAttribute('viewBox').split(' ');
-                if (vbArray.length !== 4) {
-                    console.error(`Cannot handle this viewBox: ${svgDom.getAttribute('viewBox')}`);
-                }
-                this.viewBox.x = parseFloat(vbArray[0]);
-                this.viewBox.y = parseFloat(vbArray[1]);
-                this.viewBox.w = parseFloat(vbArray[2]);
-                this.viewBox.h = parseFloat(vbArray[3]);
+                this.viewBox = Box.fromViewBoxString(svgDom.getAttribute('viewBox'));
             }
             else {
                 console.error(`cannot handle an SVG image without a viewBox yet`);
             }
             this.resizeWorkArea();
-        }
-    }
-    unexecute() {
-        const cmdIndex = this.currentDoc.getCommandIndex();
-        if (cmdIndex > 0) {
-            const cmdToUndo = this.currentDoc.rewindCommand();
-            cmdToUndo.unapply(this);
-            this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
-        }
-    }
-    reexecute() {
-        const cmdIndex = this.currentDoc.getCommandIndex();
-        if (cmdIndex < this.currentDoc.getCommandStackLength()) {
-            const cmdToRedo = this.currentDoc.redoCommand();
-            cmdToRedo.apply(this);
-            this.dispatchEvent(new CommandStateChangedEvent(this.currentDoc.getCommandIndex(), this.currentDoc.getCommandStackLength()));
         }
     }
     createShadowDOM() {
