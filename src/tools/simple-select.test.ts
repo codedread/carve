@@ -19,6 +19,7 @@ describe('SimpleSelectTool tests', () => {
 
   const VIEWBOX_WIDTH = 800;
   const VIEWBOX_HEIGHT = 600;
+  const IDENTITY_MATRIX = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 
   /* The editor image's <svg> element. */
   let fakeImageEl = {
@@ -42,6 +43,9 @@ describe('SimpleSelectTool tests', () => {
     getBBox() {
       return { x: 10, y: 20, width: 100, height: 50 };
     },
+    getCTM() {
+      return IDENTITY_MATRIX;
+    }
   } as unknown as Element;
 
   /* The EditorHost fake. */
@@ -96,4 +100,6 @@ describe('SimpleSelectTool tests', () => {
     const selectorBox = overlayEl.querySelector('#selectorBox');
     expect(Number(selectorBox.getAttribute('stroke-width'))).equals(expectedStrokeWidth);
   });
+
+  // TODO: Write a test for rotated selector overlay elements.
 });
