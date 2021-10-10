@@ -31,6 +31,9 @@ describe('SimpleSelectTool tests', () => {
     },
   } as SVGSVGElement;
 
+  /* The transformation matrix of the element that has been selected by the user. */
+  let clickedElTransformMatrix = IDENTITY_MATRIX;
+
   /* The element that has been selected by the user within the image. */
   let clickedEl = {
     parentElement: fakeImageEl,
@@ -40,12 +43,8 @@ describe('SimpleSelectTool tests', () => {
       }
       return null;
     },
-    getBBox() {
-      return { x: 10, y: 20, width: 100, height: 50 };
-    },
-    getCTM() {
-      return IDENTITY_MATRIX;
-    }
+    getBBox() { return { x: 10, y: 20, width: 100, height: 50 }; },
+    getCTM() { return clickedElTransformMatrix; }
   } as unknown as Element;
 
   /* The EditorHost fake. */
@@ -68,6 +67,7 @@ describe('SimpleSelectTool tests', () => {
   }
 
   beforeEach(() => {
+    clickedElTransformMatrix = IDENTITY_MATRIX;
     tool = new SimpleSelectTool(fakeEditorHost, {active: true, disabled: false});
   });
 
@@ -90,6 +90,7 @@ describe('SimpleSelectTool tests', () => {
   it('creates the selector overlay elements', () => {
     selectElement(clickedEl);
     expect(overlayEl.querySelector('#selectorBox')).is.not.null;
+    expect(overlayEl.querySelector('#selectorGroup').getAttribute('transform')).is.null;
   });
 
   it('sizes selector overlay width and dasharray properly', () => {
@@ -101,5 +102,11 @@ describe('SimpleSelectTool tests', () => {
     expect(Number(selectorBox.getAttribute('stroke-width'))).equals(expectedStrokeWidth);
   });
 
-  // TODO: Write a test for rotated selector overlay elements.
+  it('rotates the selector overlay elements for rotated elements', () => {
+    clickedElTransformMatrix = { a: 0.4, b: -0.9, c: 0.9, d: 0.4, e: -17, f: 76 };
+    selectElement(clickedEl);
+    const selectorGroupTransform = overlayEl.querySelector('#selectorGroup').getAttribute('transform');
+    expect(selectorGroupTransform).is.not.null;
+    expect(selectorGroupTransform.startsWith('rotate(')).is.true;
+  });
 });
