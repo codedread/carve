@@ -6,7 +6,6 @@ import 'global-jsdom/register';
 
 describe('CarveNamespaceTransformer tests', () => {
   let inEl: SVGSVGElement;
-
   let xformer: CarveNamespaceTransformer;
 
   beforeEach(() => {

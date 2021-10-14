@@ -1,7 +1,6 @@
 import { Transformer } from './transformer.js';
 import { CARVENS } from '../constants.js';
 
-// TODO: Write a unit test.
 export class CarveNamespaceTransformer implements Transformer {
   apply(svgEl: SVGSVGElement): SVGSVGElement {
     const outEl = document.importNode(svgEl, true);
