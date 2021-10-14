@@ -2,12 +2,14 @@ import { CarveNamespaceTransformer } from './carve-namespace-transformer.js';
 import { CommandStack } from '../history.js';
 import { DocElemTransformer } from './doc-elem-transformer.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
+import { HyperlinkTransformer } from './hyperlink-transformer.js';
 import { SVGDocument } from '../types/svg.js';
 import { TransformationPipeline } from './transformer.js';
 
 const sanitizingPipeline: TransformationPipeline = new TransformationPipeline([
   new CarveNamespaceTransformer(),
-  new DocElemTransformer()
+  new DocElemTransformer(),
+  new HyperlinkTransformer(),
 ]);
 
 /**
