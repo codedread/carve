@@ -54,6 +54,7 @@ describe('SimpleSelectTool tests', () => {
     commandReexecute() { },
     commandUnexecute() { },
     getImage() { return fakeImageEl; },
+    getOutputImage() { return fakeImageEl; },
     getOverlay() { return overlayEl; },
     getSelection() { return selection; },
     switchDocument() { },

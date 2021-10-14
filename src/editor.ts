@@ -1,5 +1,5 @@
 import { Box } from './math/box.js';
-import { CarveDocument, createNewDocument } from './document.js';
+import { CarveDocument, createNewDocument } from './document/document.js';
 import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
 import { CommandStateChangedEvent } from './history.js';
@@ -83,6 +83,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
   getImage(): SVGSVGElement {
     return this.topSVGElem.firstElementChild as SVGSVGElement;
+  }
+
+  getOutputImage(): SVGSVGElement {
+    return this.currentDoc.getOutputSVG();
   }
 
   getOverlay(): SVGSVGElement {

@@ -1,4 +1,4 @@
-import { createDocumentFromFile } from '../document.js';
+import { createDocumentFromFile } from '../document/document.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';

@@ -1,5 +1,5 @@
 import { Command } from './commands/command.js';
-import { CarveDocument } from './document.js';
+import { CarveDocument } from './document/document.js';
 import { Selection } from './selection.js';
 
 /** An interface that CarveEditor implements. It exposes certain methods to Commands/Tools.*/
@@ -17,8 +17,11 @@ export interface EditorHost {
   /** Un-applies the most recent command on the current document, if possible. */
   commandUnexecute();
 
-  /** Gets the <svg> element of the current document's image. */
+  /** Gets the current <svg> element of the current document's image. */
   getImage(): SVGSVGElement;
+
+  /** Gets the <svg> element of the current document's image suitable for storage. */
+  getOutputImage(): SVGSVGElement;
 
   /** Gets the <svg> element being used by the editor as an overlay layer. */
   getOverlay(): SVGSVGElement;

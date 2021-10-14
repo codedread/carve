@@ -1,4 +1,4 @@
-import { createDocumentFromFile } from '../document.js';
+import { createDocumentFromFile } from '../document/document.js';
 import { CommandStateChangedEvent, COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
 import { EditorHost } from '../editor-host.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
@@ -29,7 +29,7 @@ export class FileSaveAsTool extends SimpleActionTool {
           ],
         });
         const writableStream = await fileHandle.createWritable();
-        const svgText = new XMLSerializer().serializeToString(this.host.getImage());
+        const svgText = new XMLSerializer().serializeToString(this.host.getOutputImage());
         await writableStream.write(svgText);
         await writableStream.close();
       } catch (err) {

@@ -19,6 +19,7 @@ describe('InsertElementCommand tests', () => {
     commandReexecute() { },
     commandUnexecute() { },
     getImage() { return fakeImageEl as any as SVGSVGElement; },
+    getOutputImage() { return fakeImageEl as any as SVGSVGElement; },
     getOverlay() { return null; },
     getSelection() { return null; },
     switchDocument() { },

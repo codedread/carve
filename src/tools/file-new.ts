@@ -1,4 +1,4 @@
-import { createNewDocument } from '../document.js';
+import { createNewDocument } from '../document/document.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
 
