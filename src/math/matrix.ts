@@ -49,12 +49,16 @@ export function decomposeMatrix(matrix: Matrix|SVGMatrix): MatrixDetails {
   };
 }
 
+// TODO: Put in some precision so that 0.999999,0.999999 resolves to 1,1.
+
 /**
  * a c e
  * b d f
  * 0 0 1
  */
 export class Matrix {
+  private static IDENTITY: Matrix = null;
+
   constructor(public a: number, public b: number, public c: number, public d: number,
              public e: number, public f: number) {}
 
@@ -66,6 +70,8 @@ export class Matrix {
         this.e === that.e &&
         this.f === that.f;
   }
+
+  isIdentity(): boolean { return this.equals(Matrix.identity()); }
 
   /**
    * Multiplies this matrix by that matrix and returns a new Matrix.
@@ -100,7 +106,10 @@ export class Matrix {
   }
 
   static identity(): Matrix {
-    return new Matrix(1, 0, 0, 1, 0, 0);
+    if (!Matrix.IDENTITY) {
+      Matrix.IDENTITY = new Matrix(1, 0, 0, 1, 0, 0);
+    }
+    return Matrix.IDENTITY;
   }
 
   static fromSvgMatrix(svgMatrix: SVGMatrix): Matrix {
