@@ -102,7 +102,7 @@ export class SimpleSelectTool extends ModeTool {
     let strokeDashArray = (2 * dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
 
     const {x, y, w, h} = this.host.getSelection().getBBox();
-    let xformstr = this.transformation.toTransformString();
+    let xformstr = ` transform="${this.transformation.toTransformString()}"`;
     // Add something to the overlay layer.
     const overlay = this.host.getOverlay();
     overlay.innerHTML = `<g id="selectorGroup"${xformstr}>

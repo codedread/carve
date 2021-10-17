@@ -5,7 +5,7 @@ import { SimpleSelectTool } from './simple-select.js';
 import { CarveMouseEvent } from '../carve-mouse-event.js';
 import { Selection } from '../selection.js';
 import 'global-jsdom/register';
-//import { JSDOM } from 'jsdom';
+import sinon from 'sinon';
 
 describe('SimpleSelectTool tests', () => {
   /* The tool under test. */
@@ -44,7 +44,8 @@ describe('SimpleSelectTool tests', () => {
       return null;
     },
     getBBox() { return { x: 10, y: 20, width: 100, height: 50 }; },
-    getCTM() { return clickedElTransformMatrix; }
+    getCTM() { return clickedElTransformMatrix; },
+    removeAttribute: sinon.fake(),
   } as unknown as Element;
 
   /* The EditorHost fake. */
@@ -82,12 +83,6 @@ describe('SimpleSelectTool tests', () => {
     expect(selection.elements()[0]).equals(clickedEl);
   });
 
-  it('does not select an element if mouseup occurs outside the element', () => {
-    tool.onMouseDown({ mouseEvent: { target: clickedEl }} as unknown as CarveMouseEvent);
-    tool.onMouseUp({ mouseEvent: { target: fakeImageEl }} as unknown as CarveMouseEvent);
-    expect(selection.isEmpty()).is.true;
-  });
-
   it('creates the selector overlay elements', () => {
     selectElement(clickedEl);
     expect(overlayEl.querySelector('#selectorBox')).is.not.null;
@@ -103,11 +98,11 @@ describe('SimpleSelectTool tests', () => {
     expect(Number(selectorBox.getAttribute('stroke-width'))).equals(expectedStrokeWidth);
   });
 
-  it('rotates the selector overlay elements for rotated elements', () => {
+  it('applies transform to the selector overlay elements', () => {
     clickedElTransformMatrix = { a: 0.4, b: -0.9, c: 0.9, d: 0.4, e: -17, f: 76 };
     selectElement(clickedEl);
     const selectorGroupTransform = overlayEl.querySelector('#selectorGroup').getAttribute('transform');
     expect(selectorGroupTransform).is.not.null;
-    expect(selectorGroupTransform.startsWith('rotate(')).is.true;
+    expect(selectorGroupTransform.startsWith('matrix(')).is.true;
   });
 });
