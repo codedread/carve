@@ -2,13 +2,20 @@ import { Point } from './point.js';
 
 const RAD2DEG = 180 / Math.PI;
 
-// TODO: Write some unit tests.
+export interface MatrixDetails {
+  translateX: number;
+  translateY: number;
+  scaleX: number;
+  scaleY: number;
+  rotateDegrees: number;
+}
 
+// TODO: Write some unit tests.
 /** Given a matrix, determines the angle of rotation, in degrees. */
-export function getRotationDegrees(matrix) {
+export function decomposeMatrix(matrix: Matrix|SVGMatrix): MatrixDetails {
   // This math is taken from:
   // https://stackoverflow.com/questions/16359246/how-to-extract-position-rotation-and-scale-from-matrix-svg
-  let {a, b, c, d} = matrix;
+  let {a, b, c, d, e, f} = matrix;
 
   const scaleX = Math.sqrt(a * a + b * b);
   if (scaleX) {
@@ -33,7 +40,13 @@ export function getRotationDegrees(matrix) {
     b = -b;
   }
 
-  return Math.atan2(b, a) * RAD2DEG;  
+  return {
+    translateX: e,
+    translateY: f,
+    scaleX,
+    scaleY,
+    rotateDegrees: Math.atan2(b, a) * RAD2DEG,
+  };
 }
 
 /**
@@ -73,9 +86,8 @@ export class Matrix {
     return `{a: ${this.a}, b: ${this.b}, c: ${this.c}, d: ${this.d}, e: ${this.e}, f: ${this.f}}`;
   }
 
-  private toTransformString(): string {
-    const arr = [this.a, this.b, this.c, this.d, this.e, this.f];
-    return 'matrix(' + arr.join(',') + ')';
+  toTransformString(): string {
+    return `matrix(${[this.a, this.b, this.c, this.d, this.e, this.f].join(',')})`;
   }
 
   /**
@@ -114,9 +126,9 @@ export class Matrix {
   }
 
   /**
-   * @param {Point} dist The distance to translate, as a point.
+   * @param {Point} delta The vector to translate, as a point.
    */
-  static translateBy(dist: Point): Matrix {
-    return new Matrix(1, 0, 0, 1, dist.x, dist.y);
+  static translateBy(delta: Point): Matrix {
+    return new Matrix(1, 0, 0, 1, delta.x, delta.y);
   }
 }
