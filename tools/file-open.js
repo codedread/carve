@@ -1,4 +1,4 @@
-import { createDocumentFromFile } from '../document.js';
+import { createDocumentFromFile } from '../document/document.js';
 import { SimpleActionTool } from './tool.js';
 import { ToolbarButton } from '../toolbar-button.js';
 export const ACTION_OPEN_DOCUMENT = 'open_document';

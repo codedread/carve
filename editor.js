@@ -1,5 +1,5 @@
 import { Box } from './math/box.js';
-import { createNewDocument } from './document.js';
+import { createNewDocument } from './document/document.js';
 import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { CommandStateChangedEvent } from './history.js';
 import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
@@ -62,6 +62,9 @@ export class CarveEditor extends HTMLElement {
     }
     getImage() {
         return this.topSVGElem.firstElementChild;
+    }
+    getOutputImage() {
+        return this.currentDoc.getOutputSVG();
     }
     getOverlay() {
         return this.overlayElem;
