@@ -74,7 +74,7 @@ export class Selection extends EventTarget {
 
   /**
    * Removes the given element from the selection.
-   * Returns true if the element was present and removed. False otherweise.
+   * Returns true if the element was present and removed. False otherwise.
    */
   remove(elem: SVGGraphicsElement): boolean {
     const removeIndex = this.selectedElements.indexOf(elem);

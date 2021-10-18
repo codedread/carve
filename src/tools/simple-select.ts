@@ -5,6 +5,9 @@ import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 import { decomposeMatrix } from '../math/matrix.js';
+import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
+import { EditorHost } from '../editor-host.js';
+import { SelectionEvent, SELECTION_EVENT_TYPE } from '../selection.js';
 
 export const ACTION_SELECT_MODE = 'select_mode';
 
@@ -14,8 +17,20 @@ export class SimpleSelectTool extends ModeTool {
 
   private mousedDownElem: SVGGraphicsElement = null;
   private isTransforming: boolean = false;
+  private selectedElemOldTransformString: string = null;
   private selectedElemTransform: Matrix = null;
   private selectorGroupTransform: Matrix = null;
+
+  constructor(host: EditorHost) {
+    super(host, { active: true, disabled: false });
+    // This can happen, for example, if a drag-move was undone (the selection is reset).
+    this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt: SelectionEvent) => {
+      if (evt.selectedElements.length === 0) {
+        // Clear the selectorGroup from the work area.
+        this.host.getOverlay().innerHTML = '';
+      }
+    });
+  }
 
   getActions(): string[] { return [ ACTION_SELECT_MODE ]; }
 
@@ -83,6 +98,11 @@ export class SimpleSelectTool extends ModeTool {
 
   private transformBegin() {
     this.isTransforming = true;
+    if (this.mousedDownElem.hasAttribute('transform')) {
+      this.selectedElemOldTransformString = this.mousedDownElem.getAttribute('transform');
+    } else {
+      this.selectedElemOldTransformString = null;
+    }
     let matrix: Matrix = Matrix.fromSvgMatrix(this.mousedDownElem.getCTM());
     this.selectorGroupTransform = matrix.clone();
 
@@ -96,12 +116,21 @@ export class SimpleSelectTool extends ModeTool {
 
   private transformFinish() {
     this.isTransforming = false;
+    let newTransformString = this.mousedDownElem.getAttribute('transform');
+    if (newTransformString === this.selectedElemOldTransformString) {
+      return;
+    }
+
     if (this.selectedElemTransform.equals(Matrix.identity())) {
       this.mousedDownElem.removeAttribute('transform');
       this.host.getOverlay().querySelector('#selectorGroup').removeAttribute('transform');
+      newTransformString = null;
     }
     this.selectedElemTransform = null;
     this.selectorGroupTransform = null;
+
+    this.host.commandExecute(new ChangeAttributeCommand(this.mousedDownElem, 'transform',
+                             this.selectedElemOldTransformString, newTransformString));;
   }
 
   private updateSelectorElements() {
