@@ -45,6 +45,7 @@ describe('SimpleSelectTool tests', () => {
     },
     getBBox() { return { x: 10, y: 20, width: 100, height: 50 }; },
     getCTM() { return clickedElTransformMatrix; },
+    hasAttribute() { return false; },
     removeAttribute: sinon.fake(),
   } as unknown as Element;
 
@@ -70,7 +71,7 @@ describe('SimpleSelectTool tests', () => {
 
   beforeEach(() => {
     clickedElTransformMatrix = IDENTITY_MATRIX;
-    tool = new SimpleSelectTool(fakeEditorHost, {active: true, disabled: false});
+    tool = new SimpleSelectTool(fakeEditorHost);
   });
 
   afterEach(() => {
@@ -86,7 +87,7 @@ describe('SimpleSelectTool tests', () => {
   it('creates the selector overlay elements', () => {
     selectElement(clickedEl);
     expect(overlayEl.querySelector('#selectorBox')).is.not.null;
-    expect(overlayEl.querySelector('#selectorGroup').getAttribute('transform')).is.null;
+    expect(overlayEl.querySelector('#selectorGroup')).is.not.null;
   });
 
   it('sizes selector overlay width and dasharray properly', () => {

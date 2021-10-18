@@ -93,7 +93,8 @@ export class SimpleSelectTool extends ModeTool {
     this.mousedDownElem.setAttribute('transform', this.selectedElemTransform.toTransformString());
 
     this.selectorGroupTransform = this.selectorGroupTransform.preMultiply(Matrix.translateBy(moveVector));
-    this.host.getOverlay().querySelector('#selectorGroup').setAttribute('transform', this.selectorGroupTransform.toTransformString());
+    this.host.getOverlay().querySelector('#selectorGroup').setAttribute('transform',
+        this.selectorGroupTransform.toTransformString());
   }
 
   private transformBegin() {
