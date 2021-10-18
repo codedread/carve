@@ -62,6 +62,10 @@ export class Matrix {
   constructor(public a: number, public b: number, public c: number, public d: number,
              public e: number, public f: number) {}
 
+  clone(): Matrix {
+    return new Matrix(this.a, this.b, this.c, this.d, this.e, this.f);
+  }
+
   equals(that: Matrix): boolean {
     return this.a === that.a &&
         this.b === that.b &&
