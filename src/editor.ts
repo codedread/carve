@@ -50,9 +50,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     window.addEventListener('keyup', this);
     this.addEventListener(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, this);
     this.currentSelection.addEventListener(SELECTION_EVENT_TYPE, this);
-    this.workArea.addEventListener('mousedown', this);
-    this.workArea.addEventListener('mousemove', this);
-    this.workArea.addEventListener('mouseup', this);
+    ['mousedown', 'mousemove', 'mouseup'].forEach(t => this.workArea.addEventListener(t, this));
 
     // Create a new doc.
     createNewDocument().then(doc => this.switchDocument(doc));
@@ -81,21 +79,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
-  getImage(): SVGSVGElement {
-    return this.topSVGElem.firstElementChild as SVGSVGElement;
-  }
-
-  getOutputImage(): SVGSVGElement {
-    return this.currentDoc.getOutputSVG();
-  }
-
-  getOverlay(): SVGSVGElement {
-    return this.overlayElem;
-  }
-
-  getSelection(): Selection {
-    return this.currentSelection;
-  }
+  getImage(): SVGSVGElement { return this.topSVGElem.firstElementChild as SVGSVGElement; }
+  getOutputImage(): SVGSVGElement { return this.currentDoc.getOutputSVG(); }
+  getOverlay(): SVGSVGElement { return this.overlayElem; }
+  getSelection(): Selection { return this.currentSelection; }
 
   handleEvent(e: Event) {
     // Some events trigger an action.
@@ -104,14 +91,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       action = this.keyActionRegistry.get(e.key);
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
-    } else if (e instanceof SelectionEvent) {
-      // TODO: This is a change in editor state.
-      console.log(`Editor received a SelectionEvent`);
     } else if (e instanceof MouseEvent && this.currentModeTool) {
-      const cme = toCarveMouseEvent(e, this.viewBox,
-          parseInt(window.getComputedStyle(this.workArea)['width'], 10),
-          parseInt(window.getComputedStyle(this.workArea)['height'], 10),
-          L, M);
+      const style = window.getComputedStyle(this.workArea);
+      const cme = toCarveMouseEvent(e, this.viewBox, parseInt(style['width'], 10),
+          parseInt(style['height'], 10), L, M);
       switch (e.type) {
         case 'mousedown': this.currentModeTool.onMouseDown(cme); break;
         case 'mousemove': this.currentModeTool.onMouseMove(cme); break;
@@ -120,9 +103,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     if (action) {
-      console.log(`Editor translated an event into an Action: '${action}'`);
       const tool = this.toolActionRegistry.get(action);
-      console.log(`Editor resolved action to tool '${tool.constructor.name}'`);
+      console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
       if (tool && !tool.isDisabled()) {
         if (tool instanceof SimpleActionTool) {
           tool.onDo();
@@ -160,9 +142,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   registerTool(ctor: typeof Tool,
                customElementsMap: {[tagName: string]: ActionElementConfig} = null): CarveEditor {
     const tool = new ctor(this);
-    for (const action of tool.getActions()) {
-      this.registerToolForAction(action, tool);
-    }
+    tool.getActions().forEach(action => this.registerToolForAction(action, tool));
     for (const [tagName, config] of Object.entries(customElementsMap)) {
       // Register an anonymous class that extends the passed-in constructor but encloses the
       // tool so that the UI element has a reference to the tool and can subscribe to its events.
@@ -255,7 +235,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.topSVGElem.setAttribute('viewBox', vbstr);
     this.overlayElem.setAttribute('viewBox', vbstr);
   }
-
 }
 
 customElements.define('carve-editor', CarveEditor);
