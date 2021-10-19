@@ -78,10 +78,13 @@ describe('SimpleSelectTool tests', () => {
     selection.clear();
   })
 
-  it('selects an element', () => {
+  it('selects an element, then clears selection', () => {
     selectElement(clickedEl);
     expect(selection.elements().length).equals(1);
     expect(selection.elements()[0]).equals(clickedEl);
+
+    selectElement(fakeImageEl);
+    expect(selection.elements().length).equals(0);
   });
 
   it('creates the selector overlay elements', () => {

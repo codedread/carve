@@ -2,9 +2,9 @@ import { CarveMouseEvent } from '../carve-mouse-event.js';
 import { EditorHost } from '../editor-host.js';
 
 export interface ToolState {
-  /** Whether the tool is active right now. */
+  /** Whether the tool is active right now (i.e. the currently active tool). */
   active: boolean;
-  /** Whether the tool is disabled right now. */
+  /** Whether the tool is disabled right now (i.e. able to be used if the user tries to activate it). */
   disabled: boolean;
 }
 

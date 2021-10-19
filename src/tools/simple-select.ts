@@ -22,7 +22,7 @@ export class SimpleSelectTool extends ModeTool {
   private selectorGroupTransform: Matrix = null;
 
   constructor(host: EditorHost) {
-    super(host, { active: true, disabled: false });
+    super(host);
     // This can happen, for example, if a drag-move was undone (the selection is reset).
     this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt: SelectionEvent) => {
       if (evt.selectedElements.length === 0) {
@@ -52,6 +52,8 @@ export class SimpleSelectTool extends ModeTool {
       this.host.getSelection().set([mousedElem]);
       this.transformBegin();
       this.updateSelectorElements();
+    } else {
+      this.resetSelection();
     }
   }
 
