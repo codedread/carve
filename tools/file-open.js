@@ -4,9 +4,12 @@ import { ToolbarButton } from '../toolbar-button.js';
 export const ACTION_OPEN_DOCUMENT = 'open_document';
 /** A tool that opens a document from a file. */
 export class FileOpenTool extends SimpleActionTool {
+    constructor(host) {
+        super(host, { active: false, disabled: !window['showOpenFilePicker'] });
+    }
     getActions() { return [ACTION_OPEN_DOCUMENT]; }
     async onDo() {
-        if (window['showOpenFilePicker']) {
+        if (!this.isDisabled()) {
             try {
                 const handleArray = await window['showOpenFilePicker']({
                     multiple: false,
@@ -21,7 +24,7 @@ export class FileOpenTool extends SimpleActionTool {
                 this.host.switchDocument(await createDocumentFromFile(handleArray[0]));
             }
             catch (err) {
-                alert(err);
+                console.log(`File open tool: ${err}`);
             }
         }
         // Else, do the old file picker input thing.

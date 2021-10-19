@@ -7,12 +7,12 @@ export class FileSaveAsTool extends SimpleActionTool {
     constructor(host) {
         super(host, { active: false, disabled: true });
         this.host.addEventListener(COMMAND_STATE_CHANGED_EVENT_TYPE, (evt) => {
-            this.setDisabled(evt.commandIndex === 0);
+            this.setDisabled(!!window['showSaveFilePicker'] && evt.commandIndex === 0);
         });
     }
     getActions() { return [ACTION_SAVE_DOCUMENT_AS]; }
     async onDo() {
-        if (window['showSaveFilePicker']) {
+        if (!this.isDisabled()) {
             try {
                 const fileHandle = await window['showSaveFilePicker']({
                     types: [
@@ -28,7 +28,7 @@ export class FileSaveAsTool extends SimpleActionTool {
                 await writableStream.close();
             }
             catch (err) {
-                alert(err);
+                console.log(`File open tool: ${err}`);
             }
         }
         // Else, do the old file picker input thing.

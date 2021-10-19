@@ -3,13 +3,27 @@ import { Matrix } from '../math/matrix.js';
 import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
+import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
+import { SELECTION_EVENT_TYPE } from '../selection.js';
 export const ACTION_SELECT_MODE = 'select_mode';
 export class SimpleSelectTool extends ModeTool {
     /** How wide the stroke of the selector box is. */
     static SELECTOR_STROKE_SCALE = 1 / 2;
     mousedDownElem = null;
     isTransforming = false;
-    transformation = null;
+    selectedElemOldTransformString = null;
+    selectedElemTransform = null;
+    selectorGroupTransform = null;
+    constructor(host) {
+        super(host);
+        // This can happen, for example, if a drag-move was undone (the selection is reset).
+        this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt) => {
+            if (evt.selectedElements.length === 0) {
+                // Clear the selectorGroup from the work area.
+                this.host.getOverlay().innerHTML = '';
+            }
+        });
+    }
     getActions() { return [ACTION_SELECT_MODE]; }
     onMouseDown(evt) {
         let mousedElem = null;
@@ -28,6 +42,9 @@ export class SimpleSelectTool extends ModeTool {
             this.host.getSelection().set([mousedElem]);
             this.transformBegin();
             this.updateSelectorElements();
+        }
+        else {
+            this.resetSelection();
         }
     }
     onMouseMove(evt) {
@@ -56,23 +73,46 @@ export class SimpleSelectTool extends ModeTool {
     }
     moveSelected(dx, dy) {
         const moveVector = new Point(dx, dy);
-        this.transformation = this.transformation.preMultiply(Matrix.translateBy(moveVector));
-        const xformStr = this.transformation.toTransformString();
-        this.mousedDownElem.setAttribute('transform', xformStr);
-        this.host.getOverlay().querySelector('#selectorGroup').setAttribute('transform', xformStr);
-        console.log(`moveVector = ${moveVector.toString()}`);
+        if (moveVector.x === 0 && moveVector.y === 0) {
+            return;
+        }
+        this.selectedElemTransform = this.selectedElemTransform.preMultiply(Matrix.translateBy(moveVector));
+        this.mousedDownElem.setAttribute('transform', this.selectedElemTransform.toTransformString());
+        this.selectorGroupTransform = this.selectorGroupTransform.preMultiply(Matrix.translateBy(moveVector));
+        this.host.getOverlay().querySelector('#selectorGroup').setAttribute('transform', this.selectorGroupTransform.toTransformString());
     }
     transformBegin() {
         this.isTransforming = true;
-        this.transformation = Matrix.fromSvgMatrix(this.mousedDownElem.getCTM());
+        if (this.mousedDownElem.hasAttribute('transform')) {
+            this.selectedElemOldTransformString = this.mousedDownElem.getAttribute('transform');
+        }
+        else {
+            this.selectedElemOldTransformString = null;
+        }
+        let matrix = Matrix.fromSvgMatrix(this.mousedDownElem.getCTM());
+        this.selectorGroupTransform = matrix.clone();
+        // Adjust it by the viewBox x,y, if necessary.
+        const box = Box.fromViewBoxString(this.host.getImage().getAttribute('viewBox'));
+        if (box.x !== 0 || box.y !== 0) {
+            matrix = matrix.preMultiply(Matrix.translateBy(new Point(box.x, box.y)));
+        }
+        this.selectedElemTransform = matrix;
     }
     transformFinish() {
         this.isTransforming = false;
-        if (this.transformation.equals(Matrix.identity())) {
+        let newTransformString = this.mousedDownElem.getAttribute('transform');
+        if (newTransformString === this.selectedElemOldTransformString) {
+            return;
+        }
+        if (this.selectedElemTransform.equals(Matrix.identity())) {
             this.mousedDownElem.removeAttribute('transform');
             this.host.getOverlay().querySelector('#selectorGroup').removeAttribute('transform');
+            newTransformString = null;
         }
-        this.transformation = null;
+        this.selectedElemTransform = null;
+        this.selectorGroupTransform = null;
+        this.host.commandExecute(new ChangeAttributeCommand(this.mousedDownElem, 'transform', this.selectedElemOldTransformString, newTransformString));
+        ;
     }
     updateSelectorElements() {
         // Figure out the right stroke with based on current image's viewbox.
@@ -84,10 +124,9 @@ export class SimpleSelectTool extends ModeTool {
         let strokeWidth = (dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
         let strokeDashArray = (2 * dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
         const { x, y, w, h } = this.host.getSelection().getBBox();
-        let xformstr = this.transformation.toTransformString();
         // Add something to the overlay layer.
         const overlay = this.host.getOverlay();
-        overlay.innerHTML = `<g id="selectorGroup"${xformstr}>
+        overlay.innerHTML = `<g id="selectorGroup" transform="${this.selectorGroupTransform.toTransformString()}">
       <rect id="selectorBox" fill="none" stroke="#08f"
             stroke-width="${strokeWidth}"
             stroke-dasharray="${strokeDashArray}"

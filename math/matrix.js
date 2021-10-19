@@ -55,6 +55,9 @@ export class Matrix {
         this.e = e;
         this.f = f;
     }
+    clone() {
+        return new Matrix(this.a, this.b, this.c, this.d, this.e, this.f);
+    }
     equals(that) {
         return this.a === that.a &&
             this.b === that.b &&
