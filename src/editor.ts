@@ -85,7 +85,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   getSelection(): Selection { return this.currentSelection; }
 
   handleEvent(e: Event) {
-    // Some events trigger an action.
     let action: string;
     if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
       action = this.keyActionRegistry.get(e.key);
@@ -159,7 +158,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
    */
   switchDocument(doc: CarveDocument) {
     if (doc !== this.currentDoc) {
-      // TODO: These are changes in editor state.
       this.currentDoc = doc;
       this.currentSelection.clear();
 
