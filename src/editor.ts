@@ -216,7 +216,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
         #${CARVE_WORK_AREA} {
           background-color: lightgrey;
           position: absolute;
-          height: calc(100% - 2em);
+          height: calc(100% - 3em);
           left: 0;
           top: 3em;
           width: 100%;
