@@ -82,9 +82,9 @@ export class ToolbarButton extends HTMLElement {
             buttonTag += ` disabled`;
         }
         buttonTag += `>${this.getButtonDOM()}</button>`;
-        this.attachShadow({ mode: 'open' }).innerHTML =
-            `<style>${this.getButtonStyle()}</style>
-        ${buttonTag}`;
+        // Use existing shadow root, if it exists (from a previous render).
+        const shadowRoot = this.shadowRoot || this.attachShadow({ mode: 'open' });
+        shadowRoot.innerHTML = `<style>${this.getButtonStyle()}</style>${buttonTag}`;
     }
 }
 /** A toolbar button that can be "active". Only one ToolbarModeButton can  be active at a time. */

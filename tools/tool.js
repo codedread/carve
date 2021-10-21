@@ -23,6 +23,7 @@ export class Tool extends EventTarget {
     // Override these.
     getActions() { throw `No actions for tool ${this.constructor.name}`; }
     getDescription() { return null; }
+    getHost() { return this.host; }
     getState() { return { ...this.state }; }
     isActive() { return this.state.active; }
     isDisabled() { return this.state.disabled; }

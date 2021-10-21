@@ -6,6 +6,7 @@ import { Selection, SELECTION_EVENT_TYPE } from './selection.js';
 import { SVGNS } from './constants.js';
 import { ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
+import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
 const CARVE_BACKGROUND = 'carveBackground';
@@ -25,8 +26,10 @@ export class CarveEditor extends HTMLElement {
     viewBox = new Box();
     toolActionRegistry = new Map();
     keyActionRegistry = new Map();
-    currentModeTool = null;
     currentSelection = new Selection();
+    // Editor state. Changes here are not undo-able.
+    currentModeTool = null;
+    currentDrawingStyle = DEFAULT_DRAWING_STYLE;
     constructor() {
         super();
         this.createShadowDOM();
@@ -58,6 +61,7 @@ export class CarveEditor extends HTMLElement {
             this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
         }
     }
+    getDrawingStyle() { return { ...this.currentDrawingStyle }; }
     getImage() { return this.topSVGElem.firstElementChild; }
     getOutputImage() { return this.currentDoc.getOutputSVG(); }
     getOverlay() { return this.overlayElem; }
@@ -130,6 +134,11 @@ export class CarveEditor extends HTMLElement {
             });
         }
         return this;
+    }
+    setDrawingStyle(drawingStyle) {
+        this.currentDrawingStyle = drawingStyle;
+        // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
+        this.dispatchEvent(new DrawingStyleChangedEvent(drawingStyle));
     }
     /**
      * Switches the current document of the Editor to a new document. It releases the current
