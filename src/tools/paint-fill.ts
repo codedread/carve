@@ -2,6 +2,7 @@ import { EditorHost } from '../editor-host.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
 import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent, DRAWING_STYLE_CHANGED_EVENT_TYPE } from '../drawing-style.js';
+import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
 
 export const ACTION_PAINT_FILL = 'paint_fill';
 
@@ -25,7 +26,14 @@ export class PaintFillTool extends SimpleActionTool {
     const drawingStyle = this.host.getDrawingStyle();
     drawingStyle.fill = fillColor;
     this.host.setDrawingStyle(drawingStyle);
-    this.host.getSelection().elements().forEach(elem => elem.setAttribute('fill', fillColor));
+    const selection = this.host.getSelection();
+    // TODO: Expand this once Batch Command has been implemented.
+    if (selection.elements().length === 1) {
+      const elem = selection.elements()[0];
+      const oldFill = elem.getAttribute('fill');
+      elem.setAttribute('fill', fillColor);
+      this.host.commandExecute(new ChangeAttributeCommand(elem, 'fill', oldFill, fillColor));
+    }
     console.log(`PaintFillTool: Changed the fill color to ${fillColor}`);
   }
 }
