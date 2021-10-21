@@ -7,7 +7,7 @@ import { ToolbarModeButton } from '../toolbar-button.js';
 import { decomposeMatrix } from '../math/matrix.js';
 import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
 import { EditorHost } from '../editor-host.js';
-import { SelectionEvent, SELECTION_EVENT_TYPE } from '../selection.js';
+import { SelectionEvent } from '../selection.js';
 
 export const ACTION_SELECT_MODE = 'select_mode';
 
@@ -24,7 +24,7 @@ export class SimpleSelectTool extends ModeTool {
   constructor(host: EditorHost) {
     super(host);
     // This can happen, for example, if a drag-move was undone (the selection is reset).
-    this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt: SelectionEvent) => {
+    this.host.getSelection().addEventListener(SelectionEvent.TYPE, (evt: SelectionEvent) => {
       if (evt.selectedElements.length === 0) {
         // Clear the selectorGroup from the work area.
         this.host.getOverlay().innerHTML = '';

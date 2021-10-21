@@ -1,6 +1,6 @@
 import { DeleteElementsCommand } from '../commands/delete-elements-command.js';
 import { EditorHost } from '../editor-host.js';
-import { SelectionEvent, SELECTION_EVENT_TYPE } from '../selection.js';
+import { SelectionEvent } from '../selection.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
 
@@ -10,7 +10,7 @@ export const ACTION_DELETE = 'delete_selection';
 export class DeleteTool extends SimpleActionTool {
   constructor(host: EditorHost) {
     super(host, { active: false, disabled: true});
-    this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt: SelectionEvent) => {
+    this.host.getSelection().addEventListener(SelectionEvent.TYPE, (evt: SelectionEvent) => {
       this.setDisabled(evt.selectedElements.length === 0);
     });
   }

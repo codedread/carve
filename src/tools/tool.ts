@@ -4,20 +4,20 @@ import { EditorHost } from '../editor-host.js';
 export interface ToolState {
   /** Whether the tool is active right now (i.e. the currently active tool). */
   active: boolean;
-  /** Whether the tool is disabled right now (i.e. able to be used if the user tries to activate it). */
+  /** Whether the tool is disabled right now (i.e. not able to be activated/used). */
   disabled: boolean;
 }
 
-export const TOOL_STATE_CHANGED_EVENT_TYPE = 'carve-tool-state-changed';
-
 export class ToolStateChangedEvent extends Event {
+  static TYPE: string = 'carve-tool-state-changed';
   constructor(public newState: ToolState) {
-    super(TOOL_STATE_CHANGED_EVENT_TYPE);
+    super(ToolStateChangedEvent.TYPE);
   }
 }
 
 /**
- * Base class for the implementation of a tool (rectangle, etc).
+ * Base class for the implementation of a tool (rectangle, etc). A tool is a piece of functionality
+ * that lets the user change either change the current document or change the editor state.
  */
 export class Tool extends EventTarget {
   protected state: ToolState;

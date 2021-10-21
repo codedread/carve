@@ -4,10 +4,10 @@ import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { Command } from './commands/command.js';
 import { CommandStateChangedEvent } from './history.js';
 import { EditorHost } from './editor-host.js';
-import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js';
+import { Selection, SelectionEvent } from './selection.js';
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
-import { ToolbarButton, ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
+import { ToolbarButton, ToolbarClickedEvent } from './toolbar-button.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
@@ -52,8 +52,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
     // Listen for events.
     window.addEventListener('keyup', this);
-    this.addEventListener(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, this);
-    this.currentSelection.addEventListener(SELECTION_EVENT_TYPE, this);
+    this.addEventListener(ToolbarClickedEvent.TYPE, this);
+    this.currentSelection.addEventListener(SelectionEvent.TYPE, this);
     ['mousedown', 'mousemove', 'mouseup'].forEach(t => this.workArea.addEventListener(t, this));
 
     // Create a new doc.
@@ -158,9 +158,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   }
 
   setDrawingStyle(drawingStyle: DrawingStyle) {
+    const oldDrawingStyle = {...this.currentDrawingStyle};
     this.currentDrawingStyle = drawingStyle;
     // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
-    this.dispatchEvent(new DrawingStyleChangedEvent(drawingStyle));
+    this.dispatchEvent(new DrawingStyleChangedEvent({...drawingStyle}, oldDrawingStyle));
   }
 
   /**

@@ -2,12 +2,11 @@ import { Box } from './math/box.js';
 import { Point } from './math/point.js';
 import { DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_PRECEDING } from './constants.js';
 
-export const SELECTION_EVENT_TYPE = 'carve-selection';
-
 /** An event indicating some selection has changed. */
 export class SelectionEvent extends Event {
+  static TYPE: string = 'carve-selection';
   constructor(public selectedElements: Element[]) {
-    super(SELECTION_EVENT_TYPE);
+    super(SelectionEvent.TYPE);
   }
 }
 

@@ -1,5 +1,4 @@
-import { createDocumentFromFile } from '../document/document.js';
-import { CommandStateChangedEvent, COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
+import { CommandStateChangedEvent } from '../history.js';
 import { EditorHost } from '../editor-host.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
@@ -11,7 +10,7 @@ export const ACTION_SAVE_DOCUMENT_AS = 'save_document_as';
 export class FileSaveAsTool extends SimpleActionTool {
   constructor(host: EditorHost) {
     super(host, { active: false, disabled: true});
-    this.host.addEventListener(COMMAND_STATE_CHANGED_EVENT_TYPE, (evt: CommandStateChangedEvent) => {
+    this.host.addEventListener(CommandStateChangedEvent.TYPE, (evt: CommandStateChangedEvent) => {
       this.setDisabled(!!window['showSaveFilePicker'] && evt.commandIndex === 0);
     });
   }
