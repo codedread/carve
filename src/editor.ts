@@ -8,7 +8,7 @@ import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js'
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
-import { DrawingStyle, DEFAULT_DRAWING_STYLE } from './drawing-style.js';
+import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -83,7 +83,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
-  getDrawingStyle(): DrawingStyle { return this.currentDrawingStyle; }
+  getDrawingStyle(): DrawingStyle { return {...this.currentDrawingStyle}; }
   getImage(): SVGSVGElement { return this.topSVGElem.firstElementChild as SVGSVGElement; }
   getOutputImage(): SVGSVGElement { return this.currentDoc.getOutputSVG(); }
   getOverlay(): SVGSVGElement { return this.overlayElem; }
@@ -155,6 +155,12 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       });
     }
     return this;
+  }
+
+  setDrawingStyle(drawingStyle: DrawingStyle) {
+    this.currentDrawingStyle = drawingStyle;
+    // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
+    this.dispatchEvent(new DrawingStyleChangedEvent(drawingStyle));
   }
 
   /**

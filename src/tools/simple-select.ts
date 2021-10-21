@@ -50,6 +50,7 @@ export class SimpleSelectTool extends ModeTool {
     if (mousedElem) {
       this.mousedDownElem = mousedElem;
       this.host.getSelection().set([mousedElem]);
+      this.maybeUpdateDrawingStyle();
       this.transformBegin();
       this.updateSelectorElements();
     } else {
@@ -83,6 +84,27 @@ export class SimpleSelectTool extends ModeTool {
   private resetSelection() {
     this.host.getSelection().clear();
     this.host.getOverlay().innerHTML = '';
+  }
+
+  private maybeUpdateDrawingStyle() {
+    const selection = this.host.getSelection();
+    // If it is not a single element, we cannot update the editor's drawing style to match the
+    // selected elements.
+    if (selection.elements().length !== 1) {
+      return;
+    }
+
+    const drawingStyle = this.host.getDrawingStyle();
+    const elem = selection.elements()[0];
+    const fill = elem.getAttribute('fill');
+    let changed = false;
+    if (fill && fill !== drawingStyle.fill) {
+      drawingStyle.fill = fill;
+      changed = true;
+    }
+    if (changed) {
+      this.host.setDrawingStyle(drawingStyle);
+    }
   }
 
   private moveSelected(dx: number, dy: number) {

@@ -33,6 +33,9 @@ export interface EditorHost {
   /** Gets the current selection in the editor. */
   getSelection(): Selection;
 
+  /** Sets the drawing style in the editor. */
+  setDrawingStyle(drawingStyle: DrawingStyle);
+
   /** Switches the current document of the Editor to a new document. */
   switchDocument(doc: CarveDocument);
 }

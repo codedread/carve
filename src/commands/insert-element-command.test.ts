@@ -24,6 +24,7 @@ describe('InsertElementCommand tests', () => {
     getOutputImage() { return fakeImageEl as any as SVGSVGElement; },
     getOverlay() { return null; },
     getSelection() { return null; },
+    setDrawingStyle(drawingStyle: DrawingStyle) {},
     switchDocument() { },
   };
 

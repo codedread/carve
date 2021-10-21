@@ -61,6 +61,7 @@ describe('SimpleSelectTool tests', () => {
     getOutputImage() { return fakeImageEl; },
     getOverlay() { return overlayEl; },
     getSelection() { return selection; },
+    setDrawingStyle(drawingStyle: DrawingStyle) {},
     switchDocument() { },
   };
 

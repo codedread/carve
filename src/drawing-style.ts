@@ -1,3 +1,13 @@
+
+export const DRAWING_STYLE_CHANGED_EVENT_TYPE = 'carve-drawing-style-changed';
+
+/** An event indicating the drawing style has changed. */
+export class DrawingStyleChangedEvent extends Event {
+  constructor(public drawingStyle: DrawingStyle) {
+    super(DRAWING_STYLE_CHANGED_EVENT_TYPE);
+  }
+}
+
 /**
  * An interface that represents the editor's current drawing style.
  */
