@@ -6,6 +6,7 @@ import { CarveMouseEvent } from '../carve-mouse-event.js';
 import { Selection } from '../selection.js';
 import 'global-jsdom/register';
 import sinon from 'sinon';
+import { DrawingStyle, DEFAULT_DRAWING_STYLE } from '../drawing-style.js';
 
 describe('SimpleSelectTool tests', () => {
   /* The tool under test. */
@@ -55,6 +56,7 @@ describe('SimpleSelectTool tests', () => {
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
+    getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
     getImage() { return fakeImageEl; },
     getOutputImage() { return fakeImageEl; },
     getOverlay() { return overlayEl; },

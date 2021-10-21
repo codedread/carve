@@ -24,7 +24,7 @@ export class EllipseTool extends ModeTool {
     const elem = document.createElementNS(SVGNS, 'ellipse');
     elem.setAttribute('cx', `${evt.carveX}`);
     elem.setAttribute('cy', `${evt.carveY}`);
-    elem.setAttribute('fill', 'green');
+    elem.setAttribute('fill', this.host.getDrawingStyle().fill);
     elem.setAttribute('stroke-width', '1');
     elem.setAttribute('stroke', 'black');
 

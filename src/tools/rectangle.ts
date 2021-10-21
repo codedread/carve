@@ -24,7 +24,7 @@ export class RectangleTool extends ModeTool {
     const elem = document.createElementNS(SVGNS, 'rect');
     elem.setAttribute('x', `${evt.carveX}`);
     elem.setAttribute('y', `${evt.carveY}`);
-    elem.setAttribute('fill', 'red');
+    elem.setAttribute('fill', this.host.getDrawingStyle().fill);
     elem.setAttribute('stroke-width', '1');
     elem.setAttribute('stroke', 'black');
 

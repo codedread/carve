@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { EditorHost } from '../editor-host.js';
 import { InsertElementCommand } from './insert-element-command.js';
+import { DrawingStyle, DEFAULT_DRAWING_STYLE } from '../drawing-style.js';
 
 describe('InsertElementCommand tests', () => {
 
@@ -18,6 +19,7 @@ describe('InsertElementCommand tests', () => {
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
+    getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
     getImage() { return fakeImageEl as any as SVGSVGElement; },
     getOutputImage() { return fakeImageEl as any as SVGSVGElement; },
     getOverlay() { return null; },

@@ -8,6 +8,7 @@ import { Selection, SelectionEvent, SELECTION_EVENT_TYPE } from './selection.js'
 import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
+import { DrawingStyle, DEFAULT_DRAWING_STYLE } from './drawing-style.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -39,8 +40,11 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   private toolActionRegistry: Map<string, Tool> = new Map();
   private keyActionRegistry: Map<string, string> = new Map();
   
-  private currentModeTool: ModeTool = null;
   private currentSelection: Selection = new Selection();
+
+  // Editor state. Changes here are not undo-able.
+  private currentModeTool: ModeTool = null;
+  private currentDrawingStyle: DrawingStyle = DEFAULT_DRAWING_STYLE;
 
   constructor() {
     super();
@@ -79,6 +83,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
+  getDrawingStyle(): DrawingStyle { return this.currentDrawingStyle; }
   getImage(): SVGSVGElement { return this.topSVGElem.firstElementChild as SVGSVGElement; }
   getOutputImage(): SVGSVGElement { return this.currentDoc.getOutputSVG(); }
   getOverlay(): SVGSVGElement { return this.overlayElem; }
