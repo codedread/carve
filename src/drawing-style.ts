@@ -16,8 +16,12 @@ export class DrawingStyleChangedEvent extends Event {
 export interface DrawingStyle {
   /** Can be a RGB(A) value, a CSS color, a URL, etc. */
   fill: string;
+
+  /** Can be a RGB(A) value, a CSS color, a URL, etc. */
+  stroke: string;
 }
 
 export const DEFAULT_DRAWING_STYLE: DrawingStyle = {
   fill: 'blue',
+  stroke: 'black',
 };

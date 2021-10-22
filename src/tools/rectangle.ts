@@ -26,7 +26,7 @@ export class RectangleTool extends ModeTool {
     elem.setAttribute('y', `${evt.carveY}`);
     elem.setAttribute('fill', this.host.getDrawingStyle().fill);
     elem.setAttribute('stroke-width', '1');
-    elem.setAttribute('stroke', 'black');
+    elem.setAttribute('stroke', this.host.getDrawingStyle().stroke);
 
     this.drawingElem = elem;
     this.host.getOverlay().appendChild(elem);
