@@ -4,6 +4,7 @@ import { ACTION_NEW_DOCUMENT, FileNewButton, FileNewTool } from './tools/file-ne
 import { ACTION_OPEN_DOCUMENT, FileOpenButton, FileOpenTool } from './tools/file-open.js';
 import { ACTION_SAVE_DOCUMENT_AS, FileSaveAsButton, FileSaveAsTool } from './tools/file-save-as.js';
 import { ACTION_PAINT_FILL, PaintFillButton, PaintFillTool } from './tools/paint-fill.js';
+import { ACTION_PAINT_STROKE, PaintStrokeButton, PaintStrokeTool } from './tools/paint-stroke.js';
 import { ACTION_RECTANGLE_MODE, RectangleButton, RectangleTool } from './tools/rectangle.js';
 import { ACTION_REDO, RedoButton, RedoTool } from './tools/redo.js';
 import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tools/simple-select.js';
@@ -15,6 +16,7 @@ editor
     .registerTool(FileOpenTool, { 'carve-open-button': { ctor: FileOpenButton } })
     .registerTool(FileSaveAsTool, { 'carve-save-as-button': { ctor: FileSaveAsButton } })
     .registerTool(PaintFillTool, { 'carve-paint-fill-button': { ctor: PaintFillButton } })
+    .registerTool(PaintStrokeTool, { 'carve-paint-stroke-button': { ctor: PaintStrokeButton } })
     .registerTool(UndoTool, { 'carve-undo-button': { ctor: UndoButton } })
     .registerTool(RedoTool, { 'carve-redo-button': { ctor: RedoButton } })
     .registerTool(DeleteTool, { 'carve-delete-button': { ctor: DeleteButton } })
@@ -26,6 +28,7 @@ editor
     .registerKeyBinding('a', ACTION_SAVE_DOCUMENT_AS)
     .registerKeyBinding('e', ACTION_ELLIPSE_MODE)
     .registerKeyBinding('f', ACTION_PAINT_FILL)
+    .registerKeyBinding('k', ACTION_PAINT_STROKE)
     .registerKeyBinding('n', ACTION_NEW_DOCUMENT)
     .registerKeyBinding('o', ACTION_OPEN_DOCUMENT)
     .registerKeyBinding('r', ACTION_RECTANGLE_MODE)

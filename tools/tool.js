@@ -1,13 +1,14 @@
-export const TOOL_STATE_CHANGED_EVENT_TYPE = 'carve-tool-state-changed';
 export class ToolStateChangedEvent extends Event {
     newState;
+    static TYPE = 'carve-tool-state-changed';
     constructor(newState) {
-        super(TOOL_STATE_CHANGED_EVENT_TYPE);
+        super(ToolStateChangedEvent.TYPE);
         this.newState = newState;
     }
 }
 /**
- * Base class for the implementation of a tool (rectangle, etc).
+ * Base class for the implementation of a tool (rectangle, etc). A tool is a piece of functionality
+ * that lets the user change either change the current document or change the editor state.
  */
 export class Tool extends EventTarget {
     host;

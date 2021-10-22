@@ -2,10 +2,10 @@ import { Box } from './math/box.js';
 import { createNewDocument } from './document/document.js';
 import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { CommandStateChangedEvent } from './history.js';
-import { Selection, SELECTION_EVENT_TYPE } from './selection.js';
+import { Selection, SelectionEvent } from './selection.js';
 import { SVGNS } from './constants.js';
 import { ModeTool, SimpleActionTool } from './tools/tool.js';
-import { ToolbarClickedEvent, TOOLBAR_BUTTON_CLICKED_EVENT_TYPE } from './toolbar-button.js';
+import { ToolbarClickedEvent } from './toolbar-button.js';
 import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -35,8 +35,8 @@ export class CarveEditor extends HTMLElement {
         this.createShadowDOM();
         // Listen for events.
         window.addEventListener('keyup', this);
-        this.addEventListener(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, this);
-        this.currentSelection.addEventListener(SELECTION_EVENT_TYPE, this);
+        this.addEventListener(ToolbarClickedEvent.TYPE, this);
+        this.currentSelection.addEventListener(SelectionEvent.TYPE, this);
         ['mousedown', 'mousemove', 'mouseup'].forEach(t => this.workArea.addEventListener(t, this));
         // Create a new doc.
         createNewDocument().then(doc => this.switchDocument(doc));
@@ -136,9 +136,10 @@ export class CarveEditor extends HTMLElement {
         return this;
     }
     setDrawingStyle(drawingStyle) {
+        const oldDrawingStyle = { ...this.currentDrawingStyle };
         this.currentDrawingStyle = drawingStyle;
         // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
-        this.dispatchEvent(new DrawingStyleChangedEvent(drawingStyle));
+        this.dispatchEvent(new DrawingStyleChangedEvent({ ...drawingStyle }, oldDrawingStyle));
     }
     /**
      * Switches the current document of the Editor to a new document. It releases the current

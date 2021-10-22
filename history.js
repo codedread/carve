@@ -1,16 +1,16 @@
-export const COMMAND_STATE_CHANGED_EVENT_TYPE = 'command-state-changed';
 /**
  * An event that indicates the state of the command stack has changed.
  */
 export class CommandStateChangedEvent extends Event {
     commandIndex;
     commandStackLength;
+    static TYPE = 'carve-command-state-changed';
     constructor(
     /** The index of the pointer in the command stack. */
     commandIndex, 
     /** The length of the command stack. */
     commandStackLength) {
-        super(COMMAND_STATE_CHANGED_EVENT_TYPE);
+        super(CommandStateChangedEvent.TYPE);
         this.commandIndex = commandIndex;
         this.commandStackLength = commandStackLength;
     }

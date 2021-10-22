@@ -20,7 +20,7 @@ export class EllipseTool extends ModeTool {
         elem.setAttribute('cy', `${evt.carveY}`);
         elem.setAttribute('fill', this.host.getDrawingStyle().fill);
         elem.setAttribute('stroke-width', '1');
-        elem.setAttribute('stroke', 'black');
+        elem.setAttribute('stroke', this.host.getDrawingStyle().stroke);
         this.drawingElem = elem;
         this.host.getOverlay().appendChild(elem);
         console.log(`EllipseTool: Started creating an ellipse`);

@@ -1,6 +1,6 @@
 import { SimpleActionTool } from './tool.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
-import { COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
+import { CommandStateChangedEvent } from '../history.js';
 export const ACTION_REDO = 'redo';
 /**
  * A tool that re-does the next command. It enables itself if the pointer in the command stack is
@@ -10,7 +10,7 @@ export const ACTION_REDO = 'redo';
 export class RedoTool extends SimpleActionTool {
     constructor(host) {
         super(host, { active: false, disabled: true });
-        this.host.addEventListener(COMMAND_STATE_CHANGED_EVENT_TYPE, (evt) => {
+        this.host.addEventListener(CommandStateChangedEvent.TYPE, (evt) => {
             this.setDisabled(evt.commandIndex === evt.commandStackLength);
         });
     }

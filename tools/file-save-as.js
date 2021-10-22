@@ -1,4 +1,4 @@
-import { COMMAND_STATE_CHANGED_EVENT_TYPE } from '../history.js';
+import { CommandStateChangedEvent } from '../history.js';
 import { SimpleActionTool } from './tool.js';
 import { ToolbarButton } from '../toolbar-button.js';
 export const ACTION_SAVE_DOCUMENT_AS = 'save_document_as';
@@ -6,7 +6,7 @@ export const ACTION_SAVE_DOCUMENT_AS = 'save_document_as';
 export class FileSaveAsTool extends SimpleActionTool {
     constructor(host) {
         super(host, { active: false, disabled: true });
-        this.host.addEventListener(COMMAND_STATE_CHANGED_EVENT_TYPE, (evt) => {
+        this.host.addEventListener(CommandStateChangedEvent.TYPE, (evt) => {
             this.setDisabled(!!window['showSaveFilePicker'] && evt.commandIndex === 0);
         });
     }

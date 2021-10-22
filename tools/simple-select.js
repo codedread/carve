@@ -4,7 +4,7 @@ import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
-import { SELECTION_EVENT_TYPE } from '../selection.js';
+import { SelectionEvent } from '../selection.js';
 export const ACTION_SELECT_MODE = 'select_mode';
 export class SimpleSelectTool extends ModeTool {
     /** How wide the stroke of the selector box is. */
@@ -17,7 +17,7 @@ export class SimpleSelectTool extends ModeTool {
     constructor(host) {
         super(host);
         // This can happen, for example, if a drag-move was undone (the selection is reset).
-        this.host.getSelection().addEventListener(SELECTION_EVENT_TYPE, (evt) => {
+        this.host.getSelection().addEventListener(SelectionEvent.TYPE, (evt) => {
             if (evt.selectedElements.length === 0) {
                 // Clear the selectorGroup from the work area.
                 this.host.getOverlay().innerHTML = '';

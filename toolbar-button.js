@@ -1,10 +1,10 @@
-import { ToolStateChangedEvent, TOOL_STATE_CHANGED_EVENT_TYPE } from './tools/tool.js';
-export const TOOLBAR_BUTTON_CLICKED_EVENT_TYPE = 'carve-toolbar-button-clicked';
+import { ToolStateChangedEvent } from './tools/tool.js';
 /** Event for when the toolbar button is clicked. */
 export class ToolbarClickedEvent extends Event {
     action;
+    static TYPE = 'carve-toolbar-button-clicked';
     constructor(action) {
-        super(TOOLBAR_BUTTON_CLICKED_EVENT_TYPE, { bubbles: true });
+        super(ToolbarClickedEvent.TYPE, { bubbles: true });
         this.action = action;
     }
 }
@@ -15,7 +15,7 @@ export class ToolbarButton extends HTMLElement {
         super();
         this.tool = tool;
         this.disabled = tool.getState().disabled;
-        tool.addEventListener(TOOL_STATE_CHANGED_EVENT_TYPE, this);
+        tool.addEventListener(ToolStateChangedEvent.TYPE, this);
     }
     // Subclasses need to implement these.
     getAction() { throw `No getAction() impl in ToolbarButton sub-class`; }

@@ -1,6 +1,6 @@
 import { SimpleActionTool } from './tool.js';
 import { ToolbarButton } from '../toolbar-button.js';
-import { DEFAULT_DRAWING_STYLE, DRAWING_STYLE_CHANGED_EVENT_TYPE } from '../drawing-style.js';
+import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from '../drawing-style.js';
 import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
 export const ACTION_PAINT_FILL = 'paint_fill';
 /**
@@ -39,8 +39,8 @@ export class PaintFillButton extends ToolbarButton {
     fillColor = DEFAULT_DRAWING_STYLE.fill;
     constructor(tool) {
         super(tool);
-        tool.getHost().addEventListener(DRAWING_STYLE_CHANGED_EVENT_TYPE, (evt) => {
-            this.fillColor = evt.drawingStyle.fill;
+        tool.getHost().addEventListener(DrawingStyleChangedEvent.TYPE, (evt) => {
+            this.fillColor = evt.newDrawingStyle.fill;
             this.render();
         });
     }
