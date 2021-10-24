@@ -5,7 +5,7 @@ export const ACTION_NEW_DOCUMENT = 'new_document';
 /** A tool that opens a new document. */
 export class FileNewTool extends SimpleActionTool {
     getActions() { return [ACTION_NEW_DOCUMENT]; }
-    async onDo() {
+    async onDo(action) {
         this.host.switchDocument(await createNewDocument());
     }
 }

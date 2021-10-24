@@ -1,8 +1,9 @@
+import { Keys } from './key-handler.js';
 import { ACTION_DELETE, DeleteButton, DeleteTool } from './tools/delete.js';
 import { ACTION_ELLIPSE_MODE, EllipseButton, EllipseTool } from './tools/ellipse.js';
 import { ACTION_NEW_DOCUMENT, FileNewButton, FileNewTool } from './tools/file-new.js';
 import { ACTION_OPEN_DOCUMENT, FileOpenButton, FileOpenTool } from './tools/file-open.js';
-import { ACTION_SAVE_DOCUMENT_AS, FileSaveAsButton, FileSaveAsTool } from './tools/file-save-as.js';
+import { ACTION_SAVE_DOCUMENT, ACTION_SAVE_DOCUMENT_AS, FileSaveAsButton, FileSaveAsTool } from './tools/file-save-as.js';
 import { ACTION_PAINT_FILL, PaintFillButton, PaintFillTool } from './tools/paint-fill.js';
 import { ACTION_PAINT_STROKE, PaintStrokeButton, PaintStrokeTool } from './tools/paint-stroke.js';
 import { ACTION_RECTANGLE_MODE, RectangleButton, RectangleTool } from './tools/rectangle.js';
@@ -10,6 +11,7 @@ import { ACTION_REDO, RedoButton, RedoTool } from './tools/redo.js';
 import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tools/simple-select.js';
 import { ACTION_UNDO, UndoButton, UndoTool } from './tools/undo.js';
 const editor = document.querySelector('carve-editor');
+const CMD = navigator.platform.toLowerCase().indexOf('mac') === 0 ? Keys.META : Keys.CTRL;
 editor
     // Register all tools and their UI elements.
     .registerTool(FileNewTool, { 'carve-new-button': { ctor: FileNewButton } })
@@ -24,16 +26,18 @@ editor
     .registerTool(SimpleSelectTool, { 'carve-select-button': { ctor: SimpleSelectButton } })
     .registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton } })
     .registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton } })
-    // Register key bindings, mapping them to actions.
-    .registerKeyBinding('a', ACTION_SAVE_DOCUMENT_AS)
-    .registerKeyBinding('e', ACTION_ELLIPSE_MODE)
-    .registerKeyBinding('f', ACTION_PAINT_FILL)
-    .registerKeyBinding('k', ACTION_PAINT_STROKE)
-    .registerKeyBinding('n', ACTION_NEW_DOCUMENT)
-    .registerKeyBinding('o', ACTION_OPEN_DOCUMENT)
-    .registerKeyBinding('r', ACTION_RECTANGLE_MODE)
-    .registerKeyBinding('s', ACTION_SELECT_MODE)
-    .registerKeyBinding('z', ACTION_UNDO)
-    .registerKeyBinding('y', ACTION_REDO)
-    .registerKeyBinding('Delete', ACTION_DELETE);
+    // Register actions and their respective key bindings.
+    .registerActionForKeyBinding(ACTION_SAVE_DOCUMENT, [CMD, 's'])
+    // Note that SHIFT means this is a capital 'S'.
+    .registerActionForKeyBinding(ACTION_SAVE_DOCUMENT_AS, [CMD, Keys.ALT, Keys.SHIFT, 'S'])
+    .registerActionForKeyBinding(ACTION_ELLIPSE_MODE, ['e'])
+    .registerActionForKeyBinding(ACTION_PAINT_FILL, ['f'])
+    .registerActionForKeyBinding(ACTION_PAINT_STROKE, ['k'])
+    .registerActionForKeyBinding(ACTION_NEW_DOCUMENT, [CMD, 'n'])
+    .registerActionForKeyBinding(ACTION_OPEN_DOCUMENT, [CMD, 'o'])
+    .registerActionForKeyBinding(ACTION_RECTANGLE_MODE, ['r'])
+    .registerActionForKeyBinding(ACTION_SELECT_MODE, ['s'])
+    .registerActionForKeyBinding(ACTION_UNDO, [CMD, 'z'])
+    .registerActionForKeyBinding(ACTION_REDO, [CMD, 'y'])
+    .registerActionForKeyBinding(ACTION_DELETE, ['Delete']);
 //# sourceMappingURL=register-tools.js.map

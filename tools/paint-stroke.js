@@ -15,7 +15,7 @@ export class PaintStrokeTool extends SimpleActionTool {
      * Gets the stroke color from the user, sets the editor to the new paint value and updates the
      * stroke of any selected elements.
      */
-    async onDo() {
+    async onDo(action) {
         const strokeColor = prompt(`What stroke color?`);
         // TODO: Match it to rgb, rrggbb, rgba, rrggbbaa, a color name or something?
         const drawingStyle = this.host.getDrawingStyle();

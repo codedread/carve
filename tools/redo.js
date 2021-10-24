@@ -15,7 +15,7 @@ export class RedoTool extends SimpleActionTool {
         });
     }
     getActions() { return [ACTION_REDO]; }
-    async onDo() {
+    async onDo(action) {
         // TODO: Unit test that this is called.
         this.host.getSelection().clear();
         this.host.commandReexecute();

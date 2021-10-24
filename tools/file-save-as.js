@@ -1,44 +1,42 @@
-import { CommandStateChangedEvent } from '../history.js';
 import { SimpleActionTool } from './tool.js';
 import { ToolbarButton } from '../toolbar-button.js';
+export const ACTION_SAVE_DOCUMENT = 'save_document';
 export const ACTION_SAVE_DOCUMENT_AS = 'save_document_as';
 /** A tool that saves a document to a file. */
 export class FileSaveAsTool extends SimpleActionTool {
-    constructor(host) {
-        super(host, { active: false, disabled: true });
-        this.host.addEventListener(CommandStateChangedEvent.TYPE, (evt) => {
-            this.setDisabled(!!window['showSaveFilePicker'] && evt.commandIndex === 0);
-        });
-    }
-    getActions() { return [ACTION_SAVE_DOCUMENT_AS]; }
-    async onDo() {
+    getActions() { return [ACTION_SAVE_DOCUMENT, ACTION_SAVE_DOCUMENT_AS]; }
+    async onDo(action) {
         if (!this.isDisabled()) {
             try {
-                const fileHandle = await window['showSaveFilePicker']({
-                    types: [
-                        {
-                            description: 'SVG files',
-                            accept: { 'image/svg+xml': ['.svg'] },
-                        },
-                    ],
-                });
+                let fileHandle = this.host.getCurrentDocument().getFileHandle();
+                if (!fileHandle || action === ACTION_SAVE_DOCUMENT_AS) {
+                    fileHandle = await window['showSaveFilePicker']({
+                        types: [
+                            {
+                                description: 'SVG files',
+                                accept: { 'image/svg+xml': ['.svg'] },
+                            },
+                        ],
+                    });
+                    this.host.getCurrentDocument().setFileHandle(fileHandle);
+                }
                 const writableStream = await fileHandle.createWritable();
                 const svgText = new XMLSerializer().serializeToString(this.host.getOutputImage());
                 await writableStream.write(svgText);
                 await writableStream.close();
             }
             catch (err) {
-                console.log(`File open tool: ${err}`);
+                console.log(`File save-as tool: ${err}`);
             }
         }
         // Else, do the old file picker input thing.
     }
 }
 export class FileSaveAsButton extends ToolbarButton {
-    getAction() { return ACTION_SAVE_DOCUMENT_AS; }
+    getAction() { return ACTION_SAVE_DOCUMENT; }
     getButtonDOM() {
         return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
-    <title>Save Document As</title>
+    <title>Save Document</title>
     <g id="floppy" stroke="black" stroke-width="1" stroke-linejoin="bevel" fill="purple">
       <rect x="35" y="35" width="80" height="80" rx="5" ry="5" />
       <rect x="40" y="37" width="70" height="50" fill="white" />

@@ -39,7 +39,7 @@ export class Tool extends EventTarget {
 /** A tool that fires one action (like Open File). */
 export class SimpleActionTool extends Tool {
     // Override this.
-    async onDo() { }
+    async onDo(action) { }
 }
 /**
  * A tool that lets the user interact with the Document in the work area (like Rectangle).

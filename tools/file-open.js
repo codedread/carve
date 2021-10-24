@@ -8,7 +8,7 @@ export class FileOpenTool extends SimpleActionTool {
         super(host, { active: false, disabled: !window['showOpenFilePicker'] });
     }
     getActions() { return [ACTION_OPEN_DOCUMENT]; }
-    async onDo() {
+    async onDo(action) {
         if (!this.isDisabled()) {
             try {
                 const handleArray = await window['showOpenFilePicker']({

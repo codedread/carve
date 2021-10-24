@@ -7,6 +7,7 @@ import { SVGNS } from './constants.js';
 import { ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarClickedEvent } from './toolbar-button.js';
 import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
+import { createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
 const CARVE_BACKGROUND = 'carveBackground';
@@ -34,7 +35,8 @@ export class CarveEditor extends HTMLElement {
         super();
         this.createShadowDOM();
         // Listen for events.
-        window.addEventListener('keyup', this);
+        window.addEventListener('keydown', this, true);
+        window.addEventListener('keyup', this, true);
         this.addEventListener(ToolbarClickedEvent.TYPE, this);
         this.currentSelection.addEventListener(SelectionEvent.TYPE, this);
         ['mousedown', 'mousemove', 'mouseup'].forEach(t => this.workArea.addEventListener(t, this));
@@ -61,6 +63,7 @@ export class CarveEditor extends HTMLElement {
             this.dispatchEvent(new CommandStateChangedEvent(cmdStack.getIndex(), cmdStack.getLength()));
         }
     }
+    getCurrentDocument() { return this.currentDoc; }
     getDrawingStyle() { return { ...this.currentDrawingStyle }; }
     getImage() { return this.topSVGElem.firstElementChild; }
     getOutputImage() { return this.currentDoc.getOutputSVG(); }
@@ -68,8 +71,18 @@ export class CarveEditor extends HTMLElement {
     getSelection() { return this.currentSelection; }
     handleEvent(e) {
         let action;
-        if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
-            action = this.keyActionRegistry.get(e.key);
+        if (e instanceof KeyboardEvent) {
+            let keyString = createKeyStringFromKeyboardEvent(e);
+            if (this.keyActionRegistry.has(keyString)) {
+                action = this.keyActionRegistry.get(keyString);
+                console.log(`Found action ${action} for ${keyString}`);
+                // Cancel any browser default actions.
+                if (action && e.type === 'keydown') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+            }
         }
         else if (e instanceof ToolbarClickedEvent) {
             action = e.action;
@@ -94,7 +107,7 @@ export class CarveEditor extends HTMLElement {
             console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
             if (tool && !tool.isDisabled()) {
                 if (tool instanceof SimpleActionTool) {
-                    tool.onDo();
+                    tool.onDo(action);
                 }
                 else if (tool instanceof ModeTool) {
                     if (this.currentModeTool !== tool) {
@@ -108,15 +121,20 @@ export class CarveEditor extends HTMLElement {
             }
         }
     }
-    /** Registers an Action with the Editor by its keystroke. */
-    registerKeyBinding(key, action) {
+    /**
+     * Registers an Action with the Editor by its key combination, which must be unique. The keys
+     * array must include at least one non-modifier character.
+     */
+    registerActionForKeyBinding(action, keys) {
+        const keyString = createKeyStringFromKeys(keys);
         if (!this.toolActionRegistry.has(action)) {
             throw `Key binding attempted for action '${action} without a registered tool.`;
         }
-        if (this.keyActionRegistry.has(key)) {
-            throw `Key binding for '${key}' already bound to action '${action}'`;
+        if (this.keyActionRegistry.has(keyString)) {
+            throw `Key binding for '${keyString}' already bound to action '${action}'`;
         }
-        this.keyActionRegistry.set(key, action);
+        this.keyActionRegistry.set(keyString, action);
+        console.log(`Bound ${action} to ${keyString}`);
         return this;
     }
     /**
@@ -138,7 +156,7 @@ export class CarveEditor extends HTMLElement {
     setDrawingStyle(drawingStyle) {
         const oldDrawingStyle = { ...this.currentDrawingStyle };
         this.currentDrawingStyle = drawingStyle;
-        // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
+        // Some drawing tool buttons (Paint Fill/Stroke) listen for this so they can re-render.
         this.dispatchEvent(new DrawingStyleChangedEvent({ ...drawingStyle }, oldDrawingStyle));
     }
     /**
@@ -209,6 +227,7 @@ export class CarveEditor extends HTMLElement {
             throw `Already registered a tool to handle action '${action}`;
         }
         this.toolActionRegistry.set(action, tool);
+        console.log(`Registered ${tool.constructor.name} for action ${action}`);
     }
     resizeWorkArea() {
         const vbstr = this.viewBox.toString();

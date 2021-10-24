@@ -29,6 +29,8 @@ export class CarveDocument {
     getSVG() { return this.svgElem; }
     /** Returns the <svg> element suitable for storage. */
     getOutputSVG() { return sanitizingPipeline.unapply(this.svgElem); }
+    /** Sets the new file handle of this document. */
+    setFileHandle(handle) { this.fileHandle = handle; }
 }
 /** Creates an empty CarveDocument with a blank SVG document. */
 export function createNewDocument() {

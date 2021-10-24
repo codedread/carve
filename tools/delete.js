@@ -12,7 +12,7 @@ export class DeleteTool extends SimpleActionTool {
         });
     }
     getActions() { return [ACTION_DELETE]; }
-    async onDo() {
+    async onDo(action) {
         const selection = this.host.getSelection();
         if (selection.size() === 1) {
             const elem = selection.elements()[0];
