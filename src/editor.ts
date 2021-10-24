@@ -9,7 +9,8 @@ import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent } from './toolbar-button.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
-import { createKeyStringFromKeys } from './key-handler.js';
+import { createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
+import { FileSystemFileHandle } from './types/filesystem.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -52,7 +53,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.createShadowDOM();
 
     // Listen for events.
-    window.addEventListener('keyup', this);
+    window.addEventListener('keydown', this, true);
+    window.addEventListener('keyup', this, true);
     this.addEventListener(ToolbarClickedEvent.TYPE, this);
     this.currentSelection.addEventListener(SelectionEvent.TYPE, this);
     ['mousedown', 'mousemove', 'mouseup'].forEach(t => this.workArea.addEventListener(t, this));
@@ -84,6 +86,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
+  getCurrentDocument(): CarveDocument { return this.currentDoc; }
   getDrawingStyle(): DrawingStyle { return {...this.currentDrawingStyle}; }
   getImage(): SVGSVGElement { return this.topSVGElem.firstElementChild as SVGSVGElement; }
   getOutputImage(): SVGSVGElement { return this.currentDoc.getOutputSVG(); }
@@ -92,8 +95,18 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
   handleEvent(e: Event) {
     let action: string;
-    if (e instanceof KeyboardEvent && this.keyActionRegistry.has(e.key)) {
-      action = this.keyActionRegistry.get(e.key);
+    if (e instanceof KeyboardEvent) {
+      let keyString = createKeyStringFromKeyboardEvent(e);
+      if (this.keyActionRegistry.has(keyString)) {
+        action = this.keyActionRegistry.get(keyString);
+        console.log(`Found action ${action} for ${keyString}`);
+        // Cancel any browser default actions.
+        if (action && e.type === 'keydown') {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
     } else if (e instanceof MouseEvent && this.currentModeTool) {
@@ -141,6 +154,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     this.keyActionRegistry.set(keyString, action);
+    console.log(`Bound ${action} to ${keyString}`);
     return this;
   }
 
@@ -242,6 +256,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       throw `Already registered a tool to handle action '${action}`;
     }
     this.toolActionRegistry.set(action, tool);
+    console.log(`Registered ${tool.constructor.name} for action ${action}`)
   }
 
   private resizeWorkArea() {

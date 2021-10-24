@@ -56,6 +56,7 @@ describe('SimpleSelectTool tests', () => {
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
+    getCurrentDocument() { return null; },
     getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
     getImage() { return fakeImageEl; },
     getOutputImage() { return fakeImageEl; },

@@ -18,6 +18,9 @@ export interface EditorHost {
   /** Un-applies the most recent command on the current document, if possible. */
   commandUnexecute();
 
+  /** Gets the current document's file handle, if it exists. */
+  getCurrentDocument(): CarveDocument;
+
   /** Gets the current drawing style of the editor. */
   getDrawingStyle(): DrawingStyle;
 

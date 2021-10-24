@@ -1,5 +1,3 @@
-import { CommandStateChangedEvent } from '../history.js';
-import { EditorHost } from '../editor-host.js';
 import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
@@ -14,20 +12,24 @@ export class FileSaveAsTool extends SimpleActionTool {
   async onDo(action: string) {
     if (!this.isDisabled()) {
       try {
-        const fileHandle: FileSystemFileHandle = await window['showSaveFilePicker']({
-          types: [
-            {
-              description: 'SVG files',
-              accept: { 'image/svg+xml': ['.svg'] },
-            },
-          ],
-        });
+        let fileHandle: FileSystemFileHandle = this.host.getCurrentDocument().getFileHandle();
+        if (!fileHandle || action === ACTION_SAVE_DOCUMENT_AS) {
+          fileHandle = await window['showSaveFilePicker']({
+            types: [
+              {
+                description: 'SVG files',
+                accept: { 'image/svg+xml': ['.svg'] },
+              },
+            ],
+          });
+          this.host.getCurrentDocument().setFileHandle(fileHandle);
+        }
         const writableStream = await fileHandle.createWritable();
         const svgText = new XMLSerializer().serializeToString(this.host.getOutputImage());
         await writableStream.write(svgText);
         await writableStream.close();
       } catch (err) {
-        console.log(`File open tool: ${err}`);
+        console.log(`File save-as tool: ${err}`);
       }
     }
     // Else, do the old file picker input thing.
@@ -35,7 +37,7 @@ export class FileSaveAsTool extends SimpleActionTool {
 }
 
 export class FileSaveAsButton extends ToolbarButton {
-  getAction(): string { return ACTION_SAVE_DOCUMENT_AS; }
+  getAction(): string { return ACTION_SAVE_DOCUMENT; }
   getButtonDOM(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
     <title>Save Document</title>

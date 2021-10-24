@@ -1,12 +1,12 @@
 import 'mocha';
 import { expect } from 'chai';
 
-import { createKeysFromKeyString, createKeyStringFromKeys } from './key-handler.js';
+import { createKeysFromKeyString, createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
 
 describe('KeyHandler tests', () => {
   describe('createKeyStringFromKeys() tests', () => {
     it('createKeyStringFromKeys() produces a sorted key string', () => {
-      expect(createKeyStringFromKeys(['z', 'a'])).equals('a+z');
+      expect(createKeyStringFromKeys(['z'])).equals('z');
     });
 
     it('createKeyStringFromKeys() with a modifier produces a sorted key string', () => {
@@ -15,8 +15,27 @@ describe('KeyHandler tests', () => {
       expect(createKeyStringFromKeys(['z', 'Alt', 'Shift'])).equals(expected);
     });
 
-    it('createKeyStringFromKeys() must have at least one non-modifier', () => {
+    it('createKeyStringFromKeys() must have exactly one non-modifier', () => {
       expect(() => createKeyStringFromKeys(['Alt', 'Meta'])).throws();
+      expect(() => createKeyStringFromKeys(['a', 'z'])).throws();
+    });
+  });
+
+  describe('createKeyStringFromKeyboardEvent() tests', () => {
+    it('createKeyStringFromKeyboardEvent() produces a sorted key string', () => {
+      expect(createKeyStringFromKeyboardEvent({key: 'c'} as KeyboardEvent)).equals('c');
+    });
+
+    it('createKeyStringFromKeyboardEvent() with modifiers produces a sorted key string', () => {
+      const fakeKeyboardEvent = {
+        altKey: true,
+        ctrlKey: true,
+        metaKey: true,
+        shiftKey: true,
+        key: 'z',
+      };
+      expect(createKeyStringFromKeyboardEvent(fakeKeyboardEvent as KeyboardEvent))
+          .equals('Alt+Control+Meta+Shift+z');
     });
   });
 

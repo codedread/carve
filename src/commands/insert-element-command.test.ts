@@ -19,6 +19,7 @@ describe('InsertElementCommand tests', () => {
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
+    getCurrentDocument() { return null; },
     getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
     getImage() { return fakeImageEl as any as SVGSVGElement; },
     getOutputImage() { return fakeImageEl as any as SVGSVGElement; },
