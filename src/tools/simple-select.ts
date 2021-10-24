@@ -97,9 +97,14 @@ export class SimpleSelectTool extends ModeTool {
     const drawingStyle = this.host.getDrawingStyle();
     const elem = selection.elements()[0];
     const fill = elem.getAttribute('fill');
+    const stroke = elem.getAttribute('stroke');
     let changed = false;
     if (fill && fill !== drawingStyle.fill) {
       drawingStyle.fill = fill;
+      changed = true;
+    }
+    if (stroke && stroke !== drawingStyle.stroke) {
+      drawingStyle.stroke = stroke;
       changed = true;
     }
     if (changed) {

@@ -160,7 +160,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   setDrawingStyle(drawingStyle: DrawingStyle) {
     const oldDrawingStyle = {...this.currentDrawingStyle};
     this.currentDrawingStyle = drawingStyle;
-    // This event is listened for in some drawing tool buttons (Paint Fill) so it can re-render.
+    // Some drawing tool buttons (Paint Fill/Stroke) listen for this so they can re-render.
     this.dispatchEvent(new DrawingStyleChangedEvent({...drawingStyle}, oldDrawingStyle));
   }
 
