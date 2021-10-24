@@ -19,7 +19,7 @@ export class UndoTool extends SimpleActionTool {
 
   getActions(): string[] { return [ ACTION_UNDO ]; }
 
-  async onDo() {
+  async onDo(action: string) {
     // TODO: Unit test that this is called.
     this.host.getSelection().clear();
     this.host.commandUnexecute();

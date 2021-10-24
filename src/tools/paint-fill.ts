@@ -20,7 +20,7 @@ export class PaintFillTool extends SimpleActionTool {
    * Gets the fill color from the user, sets the editor to the new paint value and updates the
    * fill of any selected elements.
    */
-  async onDo() {
+  async onDo(action: string) {
     const fillColor = prompt(`What fill color?`);
     // TODO: Match it to rgb, rrggbb, rgba, rrggbbaa, a color name or something?
     const drawingStyle = this.host.getDrawingStyle();

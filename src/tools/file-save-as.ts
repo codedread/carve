@@ -4,20 +4,14 @@ import { FileSystemFileHandle } from '../types/filesystem.js';
 import { SimpleActionTool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
 
+export const ACTION_SAVE_DOCUMENT = 'save_document';
 export const ACTION_SAVE_DOCUMENT_AS = 'save_document_as';
 
 /** A tool that saves a document to a file. */
 export class FileSaveAsTool extends SimpleActionTool {
-  constructor(host: EditorHost) {
-    super(host, { active: false, disabled: true});
-    this.host.addEventListener(CommandStateChangedEvent.TYPE, (evt: CommandStateChangedEvent) => {
-      this.setDisabled(!!window['showSaveFilePicker'] && evt.commandIndex === 0);
-    });
-  }
+  getActions(): string[] { return [ ACTION_SAVE_DOCUMENT, ACTION_SAVE_DOCUMENT_AS ]; }
 
-  getActions(): string[] { return [ ACTION_SAVE_DOCUMENT_AS ]; }
-
-  async onDo() {
+  async onDo(action: string) {
     if (!this.isDisabled()) {
       try {
         const fileHandle: FileSystemFileHandle = await window['showSaveFilePicker']({
@@ -44,7 +38,7 @@ export class FileSaveAsButton extends ToolbarButton {
   getAction(): string { return ACTION_SAVE_DOCUMENT_AS; }
   getButtonDOM(): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
-    <title>Save Document As</title>
+    <title>Save Document</title>
     <g id="floppy" stroke="black" stroke-width="1" stroke-linejoin="bevel" fill="purple">
       <rect x="35" y="35" width="80" height="80" rx="5" ry="5" />
       <rect x="40" y="37" width="70" height="50" fill="white" />

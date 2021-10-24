@@ -17,7 +17,7 @@ export class DeleteTool extends SimpleActionTool {
 
   getActions(): string[] { return [ ACTION_DELETE ]; }
 
-  async onDo() {
+  async onDo(action: string) {
     const selection = this.host.getSelection();
     if (selection.size() === 1) {
       const elem = selection.elements()[0];

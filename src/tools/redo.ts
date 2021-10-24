@@ -20,7 +20,7 @@ export class RedoTool extends SimpleActionTool {
 
   getActions(): string[] { return [ ACTION_REDO ]; }
 
-  async onDo() {
+  async onDo(action: string) {
     // TODO: Unit test that this is called.
     this.host.getSelection().clear();
     this.host.commandReexecute();

@@ -8,7 +8,7 @@ export const ACTION_NEW_DOCUMENT = 'new_document';
 export class FileNewTool extends SimpleActionTool {
   getActions(): string[] { return [ ACTION_NEW_DOCUMENT ]; }
 
-  async onDo() {
+  async onDo(action: string) {
     this.host.switchDocument(await createNewDocument());
   }
 }
