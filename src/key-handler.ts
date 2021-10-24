@@ -21,8 +21,9 @@ export function createKeyStringFromKeys(keys: string[]): string {
     }
   }
 
+  // Key combination needs exactly one non-modifier.
   if (nonModifierKeys.length !== 1) {
-    throw `Error: Key combination needs exactly one non-modifier: ${keys.join('+')}`;
+    return null;
   }
   let str = nonModifierKeys[0];
 

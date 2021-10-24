@@ -13,7 +13,10 @@ import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tool
 import { ACTION_UNDO, UndoButton, UndoTool } from './tools/undo.js';
 
 const editor = document.querySelector('carve-editor') as CarveEditor;
-const CMD = navigator.platform.toLowerCase().indexOf('mac') === 0 ? Keys.META : Keys.CTRL;
+// We are using keyup' as the event that triggers a key action. Unfortunately,
+// Mac has issues with using the CMD/Apple key for shortcuts in browsers on keyup.
+// See https://stackoverflow.com/questions/27380018/when-cmd-key-is-kept-pressed-keyup-is-not-triggered-for-any-other-key
+const CMD = /*navigator.platform.toLowerCase().indexOf('mac') === 0 ? Keys.META : */ Keys.CTRL;
 
 editor
   // Register all tools and their UI elements.

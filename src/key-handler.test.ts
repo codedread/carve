@@ -16,8 +16,8 @@ describe('KeyHandler tests', () => {
     });
 
     it('createKeyStringFromKeys() must have exactly one non-modifier', () => {
-      expect(() => createKeyStringFromKeys(['Alt', 'Meta'])).throws();
-      expect(() => createKeyStringFromKeys(['a', 'z'])).throws();
+      expect(createKeyStringFromKeys(['Alt', 'Meta'])).equals(null);
+      expect(createKeyStringFromKeys(['a', 'z'])).equals(null);
     });
   });
 

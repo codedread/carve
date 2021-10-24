@@ -10,7 +10,6 @@ import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent } from './toolbar-button.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 import { createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
-import { FileSystemFileHandle } from './types/filesystem.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -94,6 +93,7 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   handleEvent(e: Event) {
     let action: string;
     if (e instanceof KeyboardEvent) {
+      console.dir(`KeyboardEvent: type=${e.type} key=${e.key} meta=${e.metaKey}`)
       let keyString = createKeyStringFromKeyboardEvent(e);
       if (this.keyActionRegistry.has(keyString)) {
         action = this.keyActionRegistry.get(keyString);
