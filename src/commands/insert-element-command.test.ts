@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { EditorHost } from '../editor-host.js';
 import { InsertElementCommand } from './insert-element-command.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE } from '../drawing-style.js';
+import { CarveDocument } from '../document/document.js';
 
 describe('InsertElementCommand tests', () => {
 
@@ -13,19 +14,22 @@ describe('InsertElementCommand tests', () => {
     removeChild: sinon.spy(),
   };
 
+  const fakeDocument = {
+    getSVG() { return fakeImageEl; },
+    getOutputSVG() { return fakeImageEl; },
+  } as unknown as CarveDocument;
+
   /* The EditorHost fake. */
   let fakeEditorHost: EditorHost = {
     addEventListener() {},
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
-    getCurrentDocument() { return null; },
+    getCurrentDocument() { return fakeDocument; },
     getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
-    getImage() { return fakeImageEl as any as SVGSVGElement; },
-    getOutputImage() { return fakeImageEl as any as SVGSVGElement; },
     getOverlay() { return null; },
     getSelection() { return null; },
-    setDrawingStyle(drawingStyle: DrawingStyle) {},
+    setDrawingStyle() {},
     switchDocument() { },
   };
 

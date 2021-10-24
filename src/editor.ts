@@ -88,8 +88,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
 
   getCurrentDocument(): CarveDocument { return this.currentDoc; }
   getDrawingStyle(): DrawingStyle { return {...this.currentDrawingStyle}; }
-  getImage(): SVGSVGElement { return this.topSVGElem.firstElementChild as SVGSVGElement; }
-  getOutputImage(): SVGSVGElement { return this.currentDoc.getOutputSVG(); }
   getOverlay(): SVGSVGElement { return this.overlayElem; }
   getSelection(): Selection { return this.currentSelection; }
 

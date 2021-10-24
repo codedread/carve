@@ -36,7 +36,7 @@ export class SimpleSelectTool extends ModeTool {
 
   onMouseDown(evt: CarveMouseEvent) {
     let mousedElem = null;
-    const image = this.host.getImage();
+    const image = this.host.getCurrentDocument().getSVG();
     // If the moused-upon element has the image as an ancestor, remember it.
     let node = evt.mouseEvent.target as Element;
     while (node) {
@@ -137,7 +137,7 @@ export class SimpleSelectTool extends ModeTool {
     this.selectorGroupTransform = matrix.clone();
 
     // Adjust it by the viewBox x,y, if necessary.
-    const box = Box.fromViewBoxString(this.host.getImage().getAttribute('viewBox'));
+    const box = Box.fromViewBoxString(this.host.getCurrentDocument().getSVG().getAttribute('viewBox'));
     if (box.x !== 0 || box.y !== 0) {
       matrix = matrix.preMultiply(Matrix.translateBy(new Point(box.x, box.y)));
     }
@@ -166,7 +166,7 @@ export class SimpleSelectTool extends ModeTool {
   private updateSelectorElements() {
     // Figure out the right stroke with based on current image's viewbox.
     // TODO: Turn this into a method and write some unit tests.
-    const vb = this.host.getImage().getAttribute('viewBox');
+    const vb = this.host.getCurrentDocument().getSVG().getAttribute('viewBox');
     const box = Box.fromViewBoxString(vb);
     const dimension = Math.min(box.w, box.h);
     // Default dimension is 100

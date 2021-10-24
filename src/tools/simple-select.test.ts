@@ -7,6 +7,7 @@ import { Selection } from '../selection.js';
 import 'global-jsdom/register';
 import sinon from 'sinon';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE } from '../drawing-style.js';
+import { CarveDocument } from '../document/document.js';
 
 describe('SimpleSelectTool tests', () => {
   /* The tool under test. */
@@ -50,19 +51,22 @@ describe('SimpleSelectTool tests', () => {
     removeAttribute: sinon.fake(),
   } as unknown as Element;
 
+  const fakeDocument = {
+    getSVG() { return fakeImageEl; },
+    getOutputSVG() { return fakeImageEl; },
+  } as unknown as CarveDocument;
+
   /* The EditorHost fake. */
   let fakeEditorHost: EditorHost = {
     addEventListener() {},
     commandExecute() {},
     commandReexecute() { },
     commandUnexecute() { },
-    getCurrentDocument() { return null; },
+    getCurrentDocument() { return fakeDocument; },
     getDrawingStyle(): DrawingStyle { return DEFAULT_DRAWING_STYLE; },
-    getImage() { return fakeImageEl; },
-    getOutputImage() { return fakeImageEl; },
     getOverlay() { return overlayEl; },
     getSelection() { return selection; },
-    setDrawingStyle(drawingStyle: DrawingStyle) {},
+    setDrawingStyle() {},
     switchDocument() { },
   };
 

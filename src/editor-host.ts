@@ -3,7 +3,7 @@ import { CarveDocument } from './document/document.js';
 import { DrawingStyle } from './drawing-style.js';
 import { Selection } from './selection.js';
 
-/** An interface that CarveEditor implements. It exposes certain methods to Commands/Tools.*/
+/** An interface that CarveEditor implements. It exposes certain methods to Commands/Tools. */
 export interface EditorHost {
   /** Adds an event listener to the EditorHost. */
   addEventListener(type: string, listener: EventListenerOrEventListenerObject,
@@ -18,17 +18,11 @@ export interface EditorHost {
   /** Un-applies the most recent command on the current document, if possible. */
   commandUnexecute();
 
-  /** Gets the current document's file handle, if it exists. */
+  /** Gets the current document, if it exists. */
   getCurrentDocument(): CarveDocument;
 
   /** Gets the current drawing style of the editor. */
   getDrawingStyle(): DrawingStyle;
-
-  /** Gets the current <svg> element of the current document's image. */
-  getImage(): SVGSVGElement;
-
-  /** Gets the <svg> element of the current document's image suitable for storage. */
-  getOutputImage(): SVGSVGElement;
 
   /** Gets the <svg> element being used by the editor as an overlay layer. */
   getOverlay(): SVGSVGElement;

@@ -25,7 +25,7 @@ export class FileSaveAsTool extends SimpleActionTool {
           this.host.getCurrentDocument().setFileHandle(fileHandle);
         }
         const writableStream = await fileHandle.createWritable();
-        const svgText = new XMLSerializer().serializeToString(this.host.getOutputImage());
+        const svgText = new XMLSerializer().serializeToString(this.host.getCurrentDocument().getOutputSVG());
         await writableStream.write(svgText);
         await writableStream.close();
       } catch (err) {

@@ -32,7 +32,7 @@ export class InsertElementCommand implements Command {
     if (this.newParent) {
       this.newParent.insertBefore(this.elem, this.newNextElementSibling);
     } else {
-      host.getImage().appendChild(this.elem);
+      host.getCurrentDocument().getSVG().appendChild(this.elem);
     }
   }
 
@@ -40,7 +40,7 @@ export class InsertElementCommand implements Command {
     if (this.oldParent) {
       this.oldParent.insertBefore(this.elem, this.oldNextElementSibling);
     } else {
-      this.elem = host.getImage().removeChild(this.elem);
+      this.elem = host.getCurrentDocument().getSVG().removeChild(this.elem);
     }
   }
 }
