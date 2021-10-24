@@ -28,16 +28,16 @@ editor
   .registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton }})
   .registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton }})
 
-  // Register key bindings, mapping them to actions.
-  .registerKeyBinding('a', ACTION_SAVE_DOCUMENT_AS)
-  .registerKeyBinding('e', ACTION_ELLIPSE_MODE)
-  .registerKeyBinding('f', ACTION_PAINT_FILL)
-  .registerKeyBinding('k', ACTION_PAINT_STROKE)
-  .registerKeyBinding('n', ACTION_NEW_DOCUMENT)
-  .registerKeyBinding('o', ACTION_OPEN_DOCUMENT)
-  .registerKeyBinding('r', ACTION_RECTANGLE_MODE)
-  .registerKeyBinding('s', ACTION_SELECT_MODE)
-  .registerKeyBinding('z', ACTION_UNDO)
-  .registerKeyBinding('y', ACTION_REDO)
-  .registerKeyBinding('Delete', ACTION_DELETE)
+  // Register actions and their respective key bindings.
+  .registerActionForKeyBinding(ACTION_SAVE_DOCUMENT_AS, ['a'])
+  .registerActionForKeyBinding(ACTION_ELLIPSE_MODE, ['e'])
+  .registerActionForKeyBinding(ACTION_PAINT_FILL, ['f'])
+  .registerActionForKeyBinding(ACTION_PAINT_STROKE, ['k'])
+  .registerActionForKeyBinding(ACTION_NEW_DOCUMENT, ['n'])
+  .registerActionForKeyBinding(ACTION_OPEN_DOCUMENT, ['o'])
+  .registerActionForKeyBinding(ACTION_RECTANGLE_MODE, ['r'])
+  .registerActionForKeyBinding(ACTION_SELECT_MODE, ['s'])
+  .registerActionForKeyBinding(ACTION_UNDO, ['z'])
+  .registerActionForKeyBinding(ACTION_REDO, ['y'])
+  .registerActionForKeyBinding(ACTION_DELETE, ['Delete'])
 ;

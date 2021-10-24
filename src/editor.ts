@@ -9,6 +9,7 @@ import { SVGNS } from './constants.js';
 import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent } from './toolbar-button.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
+import { createKeyStringFromKeys } from './key-handler.js';
 
 const CARVE_TOP_DIV = 'carveTopDiv';
 const CARVE_WORK_AREA = 'carveWorkArea';
@@ -125,17 +126,21 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
   }
 
-  /** Registers an Action with the Editor by its keystroke. */
-  registerKeyBinding(key: string, action: string): CarveEditor {
+  /**
+   * Registers an Action with the Editor by its key combination, which must be unique. The keys
+   * array must include at least one non-modifier character.
+   */
+  registerActionForKeyBinding(action: string, keys: string[]): CarveEditor {
+    const keyString = createKeyStringFromKeys(keys);
     if (!this.toolActionRegistry.has(action)) {
       throw `Key binding attempted for action '${action} without a registered tool.`;
     }
 
-    if (this.keyActionRegistry.has(key)) {
-      throw `Key binding for '${key}' already bound to action '${action}'`;
+    if (this.keyActionRegistry.has(keyString)) {
+      throw `Key binding for '${keyString}' already bound to action '${action}'`;
     }
 
-    this.keyActionRegistry.set(key, action);
+    this.keyActionRegistry.set(keyString, action);
     return this;
   }
 
