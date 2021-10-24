@@ -93,7 +93,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   handleEvent(e: Event) {
     let action: string;
     if (e instanceof KeyboardEvent) {
-      console.dir(`KeyboardEvent: type=${e.type} key=${e.key} meta=${e.metaKey}`)
       let keyString = createKeyStringFromKeyboardEvent(e);
       if (this.keyActionRegistry.has(keyString)) {
         action = this.keyActionRegistry.get(keyString);
