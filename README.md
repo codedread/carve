@@ -3,6 +3,8 @@
 
 # Carve
 
+Try [the DEMO](https://codedread.github.io/carve/).
+
 ## About
 
 Playing around with a simple SVG editor web app that has zero runtime dependencies.
@@ -16,6 +18,6 @@ couple shape tools, basic selection/move, delete, undo/redo.
 This demo uses modern web standards and technologies that are not broadly supported on the web,
 such as the [Native File System API](https://wicg.github.io/file-system-access/) and
 [Custom Elements](https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements).
-Some features (such as loading/saving to the native file system) will be degrade in browsers that
-do not support the relevant web specification.
+Some features (such as loading/saving to the native file system) will be degraded in browsers that
+do not support the related web specification.
 
