@@ -31,7 +31,11 @@ export class RectangleTool extends DrawingTool {
             this.host.getSelection().clear();
             // Do not create shape if it would be zero width/height.
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-                this.host.commandExecute(new InsertElementCommand(this.drawingElem));
+                // Must remove drawingElem from the overlay so that if this command is undone, it is not
+                // added back to the overlay layer.
+                // TODO: Figure out a better way to do this.
+                const rect = this.drawingElem.parentElement.removeChild(this.drawingElem);
+                this.host.commandExecute(new InsertElementCommand(rect));
                 console.log(`RectangleTool: Created a rectangle`);
             }
             else {

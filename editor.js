@@ -74,7 +74,7 @@ export class CarveEditor extends HTMLElement {
             let keyString = createKeyStringFromKeyboardEvent(e);
             if (this.keyActionRegistry.has(keyString)) {
                 action = this.keyActionRegistry.get(keyString);
-                console.log(`Found action ${action} for ${keyString}`);
+                console.log(`Found action '${action}' for ${keyString}`);
                 // Cancel any browser default actions.
                 if (action && e.type === 'keydown') {
                     e.preventDefault();
@@ -104,6 +104,7 @@ export class CarveEditor extends HTMLElement {
         if (action) {
             if (action === ACTION_STOP_DRAWING && this.currentModeTool instanceof DrawingTool) {
                 this.currentModeTool.stopDrawing();
+                console.log(`Stopped '${this.currentModeTool.constructor.name}' from drawing.`);
             }
             else {
                 const tool = this.toolActionRegistry.get(action);
