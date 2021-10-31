@@ -6,7 +6,7 @@ import { CommandStateChangedEvent } from './history.js';
 import { EditorHost } from './editor-host.js';
 import { Selection, SelectionEvent } from './selection.js';
 import { SVGNS } from './constants.js';
-import { Tool, ModeTool, SimpleActionTool } from './tools/tool.js';
+import { Tool, ModeTool, SimpleActionTool, DrawingTool } from './tools/tool.js';
 import { ToolbarButton, ToolbarClickedEvent } from './toolbar-button.js';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 import { createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
@@ -21,6 +21,8 @@ const CARVE_OVERLAY = 'carveOverlay';
 const L = 0.9;
 /** The margin on either side of the canvas. */
 const M = (1 - L) / 2;
+
+export const ACTION_STOP_DRAWING = 'stop_drawing';
 
 /** An interface for how to configure the UI custom element. */
 export interface ActionElementConfig {
@@ -117,18 +119,22 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     }
 
     if (action) {
-      const tool = this.toolActionRegistry.get(action);
-      console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
-      if (tool && !tool.isDisabled()) {
-        if (tool instanceof SimpleActionTool) {
-          tool.onDo(action);
-        } else if (tool instanceof ModeTool) {
-          if (this.currentModeTool !== tool) {
-            if (this.currentModeTool) {
-              this.currentModeTool.setActive(false);
+      if (action === ACTION_STOP_DRAWING && this.currentModeTool instanceof DrawingTool) {
+        this.currentModeTool.stopDrawing();
+      } else {
+        const tool = this.toolActionRegistry.get(action);
+        console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
+        if (tool && !tool.isDisabled()) {
+          if (tool instanceof SimpleActionTool) {
+            tool.onDo(action);
+          } else if (tool instanceof ModeTool) {
+            if (this.currentModeTool !== tool) {
+              if (this.currentModeTool) {
+                this.currentModeTool.setActive(false);
+              }
+              this.currentModeTool = tool;
+              this.currentModeTool.setActive(true);
             }
-            this.currentModeTool = tool;
-            this.currentModeTool.setActive(true);
           }
         }
       }
@@ -141,8 +147,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
    */
   registerActionForKeyBinding(action: string, keys: string[]): CarveEditor {
     const keyString = createKeyStringFromKeys(keys);
-    if (!this.toolActionRegistry.has(action)) {
-      throw `Key binding attempted for action '${action} without a registered tool.`;
+    if (action !== ACTION_STOP_DRAWING && !this.toolActionRegistry.has(action)) {
+      throw `Key binding attempted for action '${action}' without a registered tool.`;
     }
 
     if (this.keyActionRegistry.has(keyString)) {

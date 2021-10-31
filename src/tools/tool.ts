@@ -55,7 +55,7 @@ export class SimpleActionTool extends Tool {
 }
 
 /**
- * A tool that lets the user interact with the Document in the work area (like Rectangle).
+ * A tool that lets the user interact with the Document in the work area (like Select, Rectangle).
  * Only one ModeTool will be active at a given time.
  */
 export class ModeTool extends Tool {
@@ -81,12 +81,14 @@ export class ModeTool extends Tool {
 }
 
 /**
- * A tool that lets the user draw a shape. It exposes whether the user is in the process of drawing.
+ * A tool that lets the user draw a shape. It exposes whether the user is in the process of drawing
+ * and provides a method to stop the drawing..
  */
 export class DrawingTool extends ModeTool {
   private isDrawing: boolean = false;
   getIsDrawing(): boolean { return this.isDrawing; }
   setIsDrawing(d: boolean) { this.isDrawing = d; }
+  stopDrawing() { this.cleanUp(); }
   /** @override */
   protected cleanUp() {
     super.cleanUp();
