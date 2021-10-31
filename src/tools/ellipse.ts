@@ -38,18 +38,17 @@ export class EllipseTool extends ModeTool {
       this.isDrawing = false;
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
+      // Remove the ellipse from the overlay.
       const ellipseEl = this.drawingElem.parentElement.removeChild(this.drawingElem);
+      // TODO: Unit test that this is called.
+      this.host.getSelection().clear();
       // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-        // TODO: Unit test that this is called.
-        this.host.getSelection().clear();
         this.host.commandExecute(new InsertElementCommand(ellipseEl));
         console.log(`EllipseTool: Created an ellipse`);
       } else {
         console.log(`EllipseTool: Abandoned creating an ellipse`);
       }
-
-      this.host.getOverlay().innerHTML = '';
       this.cleanUp();
     }
   }

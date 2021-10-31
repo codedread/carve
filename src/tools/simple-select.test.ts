@@ -98,7 +98,7 @@ describe('SimpleSelectTool tests', () => {
   it('creates the selector overlay elements', () => {
     selectElement(clickedEl);
     expect(overlayEl.querySelector('#selectorBox')).is.not.null;
-    expect(overlayEl.querySelector('#selectorGroup')).is.not.null;
+    expect(overlayEl.querySelector('#SimpleSelectTool')).is.not.null;
   });
 
   it('sizes selector overlay width and dasharray properly', () => {
@@ -113,7 +113,7 @@ describe('SimpleSelectTool tests', () => {
   it('applies transform to the selector overlay elements', () => {
     clickedElTransformMatrix = { a: 0.4, b: -0.9, c: 0.9, d: 0.4, e: -17, f: 76 };
     selectElement(clickedEl);
-    const selectorGroupTransform = overlayEl.querySelector('#selectorGroup').getAttribute('transform');
+    const selectorGroupTransform = overlayEl.querySelector('#SimpleSelectTool').getAttribute('transform');
     expect(selectorGroupTransform).is.not.null;
     expect(selectorGroupTransform.startsWith('matrix(')).is.true;
   });

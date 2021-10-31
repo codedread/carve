@@ -1,16 +1,19 @@
 import { Box } from '../math/box.js';
 import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
+import { EditorHost } from '../editor-host.js';
 import { Matrix } from '../math/matrix.js';
 import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
-import { ToolbarModeButton } from '../toolbar-button.js';
-import { decomposeMatrix } from '../math/matrix.js';
-import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
-import { EditorHost } from '../editor-host.js';
 import { SelectionEvent } from '../selection.js';
+import { SelectionOverlay } from './selection-overlay.js';
+import { ToolbarModeButton } from '../toolbar-button.js';
 
 export const ACTION_SELECT_MODE = 'select_mode';
 
+/**
+ * A tool that lets users select a single shape in the drawing and drag-move it.
+ */
 export class SimpleSelectTool extends ModeTool {
   /** How wide the stroke of the selector box is. */
   static readonly SELECTOR_STROKE_SCALE = 1/2;
@@ -21,13 +24,17 @@ export class SimpleSelectTool extends ModeTool {
   private selectedElemTransform: Matrix = null;
   private selectorGroupTransform: Matrix = null;
 
+  private selectionOverlay: SelectionOverlay;
+
   constructor(host: EditorHost) {
     super(host);
+    this.selectionOverlay = new SelectionOverlay(this.host, SimpleSelectTool.name);
+
     // This can happen, for example, if a drag-move was undone (the selection is reset).
     this.host.getSelection().addEventListener(SelectionEvent.TYPE, (evt: SelectionEvent) => {
       if (evt.selectedElements.length === 0) {
         // Clear the selectorGroup from the work area.
-        this.host.getOverlay().innerHTML = '';
+        this.selectionOverlay.hide();
       }
     });
   }
@@ -83,7 +90,7 @@ export class SimpleSelectTool extends ModeTool {
 
   private resetSelection() {
     this.host.getSelection().clear();
-    this.host.getOverlay().innerHTML = '';
+    this.selectionOverlay.hide();
   }
 
   private maybeUpdateDrawingStyle() {
@@ -122,8 +129,7 @@ export class SimpleSelectTool extends ModeTool {
     this.mousedDownElem.setAttribute('transform', this.selectedElemTransform.toTransformString());
 
     this.selectorGroupTransform = this.selectorGroupTransform.preMultiply(Matrix.translateBy(moveVector));
-    this.host.getOverlay().querySelector('#selectorGroup').setAttribute('transform',
-        this.selectorGroupTransform.toTransformString());
+    this.selectionOverlay.update({transform: this.selectorGroupTransform});
   }
 
   private transformBegin() {
@@ -153,7 +159,6 @@ export class SimpleSelectTool extends ModeTool {
 
     if (this.selectedElemTransform.equals(Matrix.identity())) {
       this.mousedDownElem.removeAttribute('transform');
-      this.host.getOverlay().querySelector('#selectorGroup').removeAttribute('transform');
       newTransformString = null;
     }
     this.selectedElemTransform = null;
@@ -174,14 +179,15 @@ export class SimpleSelectTool extends ModeTool {
     let strokeDashArray = (2 * dimension / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE;
 
     const {x, y, w, h} = this.host.getSelection().getBBox();
-    // Add something to the overlay layer.
-    const overlay = this.host.getOverlay();
-    overlay.innerHTML = `<g id="selectorGroup" transform="${this.selectorGroupTransform.toTransformString()}">
-      <rect id="selectorBox" fill="none" stroke="#08f"
-            stroke-width="${strokeWidth}"
-            stroke-dasharray="${strokeDashArray}"
-            x="${x}" y="${y}" width="${w}" height="${h}" />
-    </g>`;
+    this.selectionOverlay.update({
+      x,
+      y,
+      width: w,
+      height: h,
+      strokeWidth,
+      strokeDashArray,
+      transform: this.selectorGroupTransform
+    });
   }
 }
 
