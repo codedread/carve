@@ -79,3 +79,17 @@ export class ModeTool extends Tool {
    */
   protected cleanUp() {}
 }
+
+/**
+ * A tool that lets the user draw a shape. It exposes whether the user is in the process of drawing.
+ */
+export class DrawingTool extends ModeTool {
+  private isDrawing: boolean = false;
+  getIsDrawing(): boolean { return this.isDrawing; }
+  setIsDrawing(d: boolean) { this.isDrawing = d; }
+  /** @override */
+  protected cleanUp() {
+    super.cleanUp();
+    this.isDrawing = false;
+  }
+}

@@ -1,6 +1,6 @@
 import { CarveMouseEvent } from '../carve-mouse-event.js';
+import { DrawingTool } from './tool.js';
 import { InsertElementCommand } from '../commands/insert-element-command.js';
-import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
@@ -8,8 +8,7 @@ import { ToolbarModeButton } from '../toolbar-button.js';
 export const ACTION_RECTANGLE_MODE = 'rectangle_mode';
 
 /** A tool for drawing a rectangle. */
-export class RectangleTool extends ModeTool {
-  private isDrawing: boolean = false;
+export class RectangleTool extends DrawingTool {
   private startPoint: Point;
   private endPoint: Point;
   private drawingElem: SVGRectElement;
@@ -17,7 +16,7 @@ export class RectangleTool extends ModeTool {
   getActions(): string[] { return [ ACTION_RECTANGLE_MODE ]; }
 
   onMouseDown(evt: CarveMouseEvent) {
-    this.isDrawing = true;
+    this.setIsDrawing(true);
     this.startPoint = new Point(evt.carveX, evt.carveY);
     this.endPoint = new Point(evt.carveX, evt.carveY);
 
@@ -34,8 +33,7 @@ export class RectangleTool extends ModeTool {
   }
 
   onMouseUp(evt: CarveMouseEvent) {
-    if (this.isDrawing) {
-      this.isDrawing = false;
+    if (this.getIsDrawing()) {
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
       // TODO: Unit test that this is called.
@@ -52,7 +50,7 @@ export class RectangleTool extends ModeTool {
   }
 
   onMouseMove(evt: CarveMouseEvent) {
-    if (this.isDrawing) {
+    if (this.getIsDrawing()) {
       this.endPoint.x = evt.carveX;
       this.endPoint.y = evt.carveY;
       this.drawingElem.setAttribute('width', `${Math.abs(this.endPoint.x - this.startPoint.x)}`);
@@ -66,7 +64,7 @@ export class RectangleTool extends ModeTool {
 
   /** @override */
   protected cleanUp() {
-    this.isDrawing = false;
+    super.cleanUp();
     this.startPoint = null;
     this.endPoint = null;
     // Always clean up the drawing element if it was left on the overlay layer.

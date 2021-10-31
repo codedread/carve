@@ -41,9 +41,8 @@ export class CarveEditor extends HTMLElement implements EditorHost {
   private toolActionRegistry: Map<string, Tool> = new Map();
   private keyActionRegistry: Map<string, string> = new Map();
   
-  private currentSelection: Selection = new Selection();
-
   // Editor state. Changes here are not undo-able.
+  private currentSelection: Selection = new Selection();
   private currentModeTool: ModeTool = null;
   private currentDrawingStyle: DrawingStyle = DEFAULT_DRAWING_STYLE;
 
