@@ -4,7 +4,7 @@ import { toCarveMouseEvent } from './carve-mouse-event.js';
 import { CommandStateChangedEvent } from './history.js';
 import { Selection, SelectionEvent } from './selection.js';
 import { SVGNS } from './constants.js';
-import { ModeTool, SimpleActionTool } from './tools/tool.js';
+import { ModeTool, SimpleActionTool, DrawingTool } from './tools/tool.js';
 import { ToolbarClickedEvent } from './toolbar-button.js';
 import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from './drawing-style.js';
 import { createKeyStringFromKeyboardEvent, createKeyStringFromKeys } from './key-handler.js';
@@ -17,6 +17,7 @@ const CARVE_OVERLAY = 'carveOverlay';
 const L = 0.9;
 /** The margin on either side of the canvas. */
 const M = (1 - L) / 2;
+export const ACTION_STOP_DRAWING = 'stop_drawing';
 /** A CarveEditor can open a CarveDocument into the work area. */
 export class CarveEditor extends HTMLElement {
     currentDoc;
@@ -27,8 +28,8 @@ export class CarveEditor extends HTMLElement {
     viewBox = new Box();
     toolActionRegistry = new Map();
     keyActionRegistry = new Map();
-    currentSelection = new Selection();
     // Editor state. Changes here are not undo-able.
+    currentSelection = new Selection();
     currentModeTool = null;
     currentDrawingStyle = DEFAULT_DRAWING_STYLE;
     constructor() {
@@ -65,8 +66,6 @@ export class CarveEditor extends HTMLElement {
     }
     getCurrentDocument() { return this.currentDoc; }
     getDrawingStyle() { return { ...this.currentDrawingStyle }; }
-    getImage() { return this.topSVGElem.firstElementChild; }
-    getOutputImage() { return this.currentDoc.getOutputSVG(); }
     getOverlay() { return this.overlayElem; }
     getSelection() { return this.currentSelection; }
     handleEvent(e) {
@@ -103,19 +102,24 @@ export class CarveEditor extends HTMLElement {
             }
         }
         if (action) {
-            const tool = this.toolActionRegistry.get(action);
-            console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
-            if (tool && !tool.isDisabled()) {
-                if (tool instanceof SimpleActionTool) {
-                    tool.onDo(action);
-                }
-                else if (tool instanceof ModeTool) {
-                    if (this.currentModeTool !== tool) {
-                        if (this.currentModeTool) {
-                            this.currentModeTool.setActive(false);
+            if (action === ACTION_STOP_DRAWING && this.currentModeTool instanceof DrawingTool) {
+                this.currentModeTool.stopDrawing();
+            }
+            else {
+                const tool = this.toolActionRegistry.get(action);
+                console.log(`Resolved ${e.type} event into ${action} action, ${tool.constructor.name}`);
+                if (tool && !tool.isDisabled()) {
+                    if (tool instanceof SimpleActionTool) {
+                        tool.onDo(action);
+                    }
+                    else if (tool instanceof ModeTool) {
+                        if (this.currentModeTool !== tool) {
+                            if (this.currentModeTool) {
+                                this.currentModeTool.setActive(false);
+                            }
+                            this.currentModeTool = tool;
+                            this.currentModeTool.setActive(true);
                         }
-                        this.currentModeTool = tool;
-                        this.currentModeTool.setActive(true);
                     }
                 }
             }
@@ -127,8 +131,8 @@ export class CarveEditor extends HTMLElement {
      */
     registerActionForKeyBinding(action, keys) {
         const keyString = createKeyStringFromKeys(keys);
-        if (!this.toolActionRegistry.has(action)) {
-            throw `Key binding attempted for action '${action} without a registered tool.`;
+        if (action !== ACTION_STOP_DRAWING && !this.toolActionRegistry.has(action)) {
+            throw `Key binding attempted for action '${action}' without a registered tool.`;
         }
         if (this.keyActionRegistry.has(keyString)) {
             throw `Key binding for '${keyString}' already bound to action '${action}'`;

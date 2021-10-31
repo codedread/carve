@@ -1,18 +1,17 @@
+import { DrawingTool } from './tool.js';
 import { InsertElementCommand } from '../commands/insert-element-command.js';
-import { ModeTool } from './tool.js';
 import { Point } from '../math/point.js';
 import { SVGNS } from '../constants.js';
 import { ToolbarModeButton } from '../toolbar-button.js';
 export const ACTION_RECTANGLE_MODE = 'rectangle_mode';
 /** A tool for drawing a rectangle. */
-export class RectangleTool extends ModeTool {
-    isDrawing = false;
+export class RectangleTool extends DrawingTool {
     startPoint;
     endPoint;
     drawingElem;
     getActions() { return [ACTION_RECTANGLE_MODE]; }
     onMouseDown(evt) {
-        this.isDrawing = true;
+        this.setIsDrawing(true);
         this.startPoint = new Point(evt.carveX, evt.carveY);
         this.endPoint = new Point(evt.carveX, evt.carveY);
         const elem = document.createElementNS(SVGNS, 'rect');
@@ -26,26 +25,23 @@ export class RectangleTool extends ModeTool {
         console.log(`RectangleTool: Started creating a rectangle`);
     }
     onMouseUp(evt) {
-        if (this.isDrawing) {
-            this.isDrawing = false;
+        if (this.getIsDrawing()) {
             this.endPoint = new Point(evt.carveX, evt.carveY);
+            // TODO: Unit test that this is called.
+            this.host.getSelection().clear();
             // Do not create shape if it would be zero width/height.
-            const rectElem = this.drawingElem.parentElement.removeChild(this.drawingElem);
             if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-                // TODO: Unit test that this is called.
-                this.host.getSelection().clear();
-                this.host.commandExecute(new InsertElementCommand(rectElem));
+                this.host.commandExecute(new InsertElementCommand(this.drawingElem));
                 console.log(`RectangleTool: Created a rectangle`);
             }
             else {
                 console.log(`RectangleTool: Abandoned creating a rectangle`);
             }
-            this.host.getOverlay().innerHTML = '';
             this.cleanUp();
         }
     }
     onMouseMove(evt) {
-        if (this.isDrawing) {
+        if (this.getIsDrawing()) {
             this.endPoint.x = evt.carveX;
             this.endPoint.y = evt.carveY;
             this.drawingElem.setAttribute('width', `${Math.abs(this.endPoint.x - this.startPoint.x)}`);
@@ -54,10 +50,15 @@ export class RectangleTool extends ModeTool {
             this.drawingElem.setAttribute('y', `${(this.endPoint.y < this.startPoint.y) ? this.endPoint.y : this.startPoint.y}`);
         }
     }
+    /** @override */
     cleanUp() {
-        this.isDrawing = false;
+        super.cleanUp();
         this.startPoint = null;
         this.endPoint = null;
+        // Always clean up the drawing element if it was left on the overlay layer.
+        if (this.drawingElem && this.drawingElem.parentNode === this.host.getOverlay()) {
+            this.drawingElem.parentElement.removeChild(this.drawingElem);
+        }
         this.drawingElem = null;
     }
 }

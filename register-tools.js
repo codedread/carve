@@ -1,3 +1,4 @@
+import { ACTION_STOP_DRAWING } from './editor.js';
 import { Keys } from './key-handler.js';
 import { ACTION_DELETE, DeleteButton, DeleteTool } from './tools/delete.js';
 import { ACTION_ELLIPSE_MODE, EllipseButton, EllipseTool } from './tools/ellipse.js';
@@ -11,7 +12,10 @@ import { ACTION_REDO, RedoButton, RedoTool } from './tools/redo.js';
 import { ACTION_SELECT_MODE, SimpleSelectButton, SimpleSelectTool } from './tools/simple-select.js';
 import { ACTION_UNDO, UndoButton, UndoTool } from './tools/undo.js';
 const editor = document.querySelector('carve-editor');
-const CMD = navigator.platform.toLowerCase().indexOf('mac') === 0 ? Keys.META : Keys.CTRL;
+// We are using keyup' as the event that triggers a key action. Unfortunately,
+// Mac has issues with using the CMD/Apple key for shortcuts in browsers on keyup.
+// See https://stackoverflow.com/questions/27380018/when-cmd-key-is-kept-pressed-keyup-is-not-triggered-for-any-other-key
+const CMD = /*navigator.platform.toLowerCase().indexOf('mac') === 0 ? Keys.META : */ Keys.CTRL;
 editor
     // Register all tools and their UI elements.
     .registerTool(FileNewTool, { 'carve-new-button': { ctor: FileNewButton } })
@@ -27,8 +31,8 @@ editor
     .registerTool(RectangleTool, { 'carve-rectangle-button': { ctor: RectangleButton } })
     .registerTool(EllipseTool, { 'carve-ellipse-button': { ctor: EllipseButton } })
     // Register actions and their respective key bindings.
+    .registerActionForKeyBinding(ACTION_STOP_DRAWING, ['Escape'])
     .registerActionForKeyBinding(ACTION_SAVE_DOCUMENT, [CMD, 's'])
-    // Note that SHIFT means this is a capital 'S'.
     .registerActionForKeyBinding(ACTION_SAVE_DOCUMENT_AS, [CMD, Keys.ALT, Keys.SHIFT, 'S'])
     .registerActionForKeyBinding(ACTION_ELLIPSE_MODE, ['e'])
     .registerActionForKeyBinding(ACTION_PAINT_FILL, ['f'])

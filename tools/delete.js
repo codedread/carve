@@ -17,8 +17,6 @@ export class DeleteTool extends SimpleActionTool {
         if (selection.size() === 1) {
             const elem = selection.elements()[0];
             selection.clear();
-            // Clear the selection bbox. TODO: Figure out a better way.
-            this.host.getOverlay().innerHTML = '';
             this.host.commandExecute(new DeleteElementsCommand(elem));
             console.log(`DeleteTool: Deleted an element`);
         }
