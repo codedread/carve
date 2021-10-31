@@ -38,13 +38,11 @@ export class EllipseTool extends ModeTool {
       this.isDrawing = false;
       this.endPoint = new Point(evt.carveX, evt.carveY);
 
-      // Remove the ellipse from the overlay.
-      const ellipseEl = this.drawingElem.parentElement.removeChild(this.drawingElem);
       // TODO: Unit test that this is called.
       this.host.getSelection().clear();
       // Do not create shape if it would be zero width/height.
       if (this.startPoint.x !== this.endPoint.x && this.startPoint.y !== this.endPoint.y) {
-        this.host.commandExecute(new InsertElementCommand(ellipseEl));
+        this.host.commandExecute(new InsertElementCommand(this.drawingElem));
         console.log(`EllipseTool: Created an ellipse`);
       } else {
         console.log(`EllipseTool: Abandoned creating an ellipse`);
@@ -62,10 +60,15 @@ export class EllipseTool extends ModeTool {
     }
   }
 
-  private cleanUp() {
+  /** @override */
+  protected cleanUp() {
     this.isDrawing = false;
     this.startPoint = null;
     this.endPoint = null;
+    // Always clean up the drawing element if it was left on the overlay layer.
+    if (this.drawingElem && this.drawingElem.parentNode === this.host.getOverlay()) {
+      this.drawingElem.parentElement.removeChild(this.drawingElem);
+    }
     this.drawingElem = null;
   }
 }

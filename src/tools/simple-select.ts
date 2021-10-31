@@ -40,6 +40,8 @@ export class SimpleSelectTool extends ModeTool {
   }
 
   getActions(): string[] { return [ ACTION_SELECT_MODE ]; }
+  /** Visible for testing. */
+  getOverlayUI(): SelectionOverlay { return this.selectionOverlay; }
 
   onMouseDown(evt: CarveMouseEvent) {
     let mousedElem = null;
@@ -61,7 +63,7 @@ export class SimpleSelectTool extends ModeTool {
       this.transformBegin();
       this.updateSelectorElements();
     } else {
-      this.resetSelection();
+      this.cleanUp();
     }
   }
 
@@ -81,14 +83,7 @@ export class SimpleSelectTool extends ModeTool {
   }
 
   /** @override */
-  setActive(active: boolean) {
-    super.setActive(active);
-    if (!active) {
-      this.resetSelection();
-    }
-  }
-
-  private resetSelection() {
+  protected cleanUp() {
     this.host.getSelection().clear();
     this.selectionOverlay.hide();
   }

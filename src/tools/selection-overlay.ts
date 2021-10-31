@@ -48,13 +48,9 @@ export class SelectionOverlay {
     this.host.getOverlay().appendChild(this.overlayGroup);
   }
 
-  hide() {
-    this.overlayGroup.style.display = 'none';
-  }
-
-  show() {
-    this.overlayGroup.style.display = 'block';
-  }
+  hide() { this.overlayGroup.style.display = 'none'; }
+  isShown(): boolean { return this.overlayGroup.style.display === 'block'; }
+  show() { this.overlayGroup.style.display = 'block'; }
 
   /**
    * Updates the overlay UI elements to match the new parameters.

@@ -9,6 +9,8 @@ import sinon from 'sinon';
 import { DrawingStyle, DEFAULT_DRAWING_STYLE } from '../drawing-style.js';
 import { CarveDocument } from '../document/document.js';
 
+// TODO: Mock out SelectionOverlay.
+
 describe('SimpleSelectTool tests', () => {
   /* The tool under test. */
   let tool: SimpleSelectTool = null;
@@ -90,11 +92,14 @@ describe('SimpleSelectTool tests', () => {
     selectElement(clickedEl);
     expect(selection.elements().length).equals(1);
     expect(selection.elements()[0]).equals(clickedEl);
+    expect(tool.getOverlayUI().isShown()).is.true;
 
     selectElement(fakeImageEl);
     expect(selection.elements().length).equals(0);
+    expect(tool.getOverlayUI().isShown()).is.false;
   });
 
+  // TODO: Move these test into selection-overlay.test.ts.
   it('creates the selector overlay elements', () => {
     selectElement(clickedEl);
     expect(overlayEl.querySelector('#selectorBox')).is.not.null;

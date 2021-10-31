@@ -67,7 +67,15 @@ export class ModeTool extends Tool {
     if (this.state.active !== active) {
       console.log(`Tool '${this.constructor.name}' is becoming ${active ? 'active' : 'inactive'}`);
       this.state.active = active;
+      if (!active) {
+        this.cleanUp();
+      }
       this.dispatchEvent(new ToolStateChangedEvent({...this.state}));
     }
   }
+  /**
+   * Override this in sub-classes to clean up any state the tool might have. This is called when the
+   * tool goes from active to inactive.
+   */
+  protected cleanUp() {}
 }
