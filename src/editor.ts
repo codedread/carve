@@ -195,11 +195,10 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       this.currentDoc = doc;
       this.currentSelection.clear();
 
-      // Clear out previous SVG doc and the overlay layer.
+      // Clear out previous SVG doc.
       while (this.topSVGElem.hasChildNodes()) {
         this.topSVGElem.removeChild(this.topSVGElem.firstChild);
       }
-      this.overlayElem.innerHTML = '';
 
       const svgDom = this.currentDoc.getSVG();
       this.topSVGElem.appendChild(svgDom);

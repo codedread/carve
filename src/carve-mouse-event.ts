@@ -39,7 +39,7 @@ export function toCarveMouseEvent(mouseEvent: MouseEvent, viewBox: Box,
     const diffW = (waw - wah) / 2;
     fx = (x - diffW - (wah * waMargin)) / (wah * waFraction);
 
-    // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
+    // TODO: I don't think these are right. I think they need to be "spread" like fx, fy are.
     carveMoveX = viewBox.w * mouseEvent.movementX / (wah * waFraction);
     carveMoveY = viewBox.h * mouseEvent.movementY / (wah * waFraction);
   } else {
@@ -50,7 +50,7 @@ export function toCarveMouseEvent(mouseEvent: MouseEvent, viewBox: Box,
     const diffH = (wah - waw) / 2;
     fy = (y - diffH - (waw * waMargin)) / (waw * waFraction);
 
-    // TOOD: I don't think these are right. I think they need to be "spread" like fx, fy are.
+    // TODO: I don't think these are right. I think they need to be "spread" like fx, fy are.
     carveMoveX = viewBox.w * mouseEvent.movementX / (waw * waFraction);
     carveMoveY = viewBox.h * mouseEvent.movementY / (waw * waFraction);
   }
