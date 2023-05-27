@@ -13,13 +13,13 @@ import { CarveDocument } from '../document/document.js';
 
 describe('SimpleSelectTool tests', () => {
   /* The tool under test. */
-  let tool: SimpleSelectTool = null;
+  let tool: SimpleSelectTool;
 
   /* The editor's Selection. */
   let selection: Selection = new Selection();
 
   /* The editor overlay's <svg> element. */
-  let overlayEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  let overlayEl: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
   const VIEWBOX_WIDTH = 800;
   const VIEWBOX_HEIGHT = 600;
@@ -41,7 +41,7 @@ describe('SimpleSelectTool tests', () => {
   /* The element that has been selected by the user within the image. */
   let clickedEl = {
     parentElement: fakeImageEl,
-    getAttribute(attrName: string): string {
+    getAttribute(attrName: string): string|null {
       switch (attrName) {
         case 'stroke-width': return '4';
       }
@@ -111,15 +111,15 @@ describe('SimpleSelectTool tests', () => {
 
     // Tool uses the minimum of the viewbox width/height. In our case that is VIEWBOX_HEIGHT.
     const expectedStrokeWidth = (VIEWBOX_HEIGHT / 100) * SimpleSelectTool.SELECTOR_STROKE_SCALE
-    const selectorBox = overlayEl.querySelector('#selectorBox');
+    const selectorBox = overlayEl.querySelector('#selectorBox') as HTMLElement;
     expect(Number(selectorBox.getAttribute('stroke-width'))).equals(expectedStrokeWidth);
   });
 
   it('applies transform to the selector overlay elements', () => {
     clickedElTransformMatrix = { a: 0.4, b: -0.9, c: 0.9, d: 0.4, e: -17, f: 76 };
     selectElement(clickedEl);
-    const selectorGroupTransform = overlayEl.querySelector('#SimpleSelectTool').getAttribute('transform');
-    expect(selectorGroupTransform).is.not.null;
+    const toolEl = overlayEl.querySelector('#SimpleSelectTool') as Element;
+    const selectorGroupTransform = toolEl.getAttribute('transform') as string;
     expect(selectorGroupTransform.startsWith('matrix(')).is.true;
   });
 });

@@ -1,0 +1,11 @@
+{
+  "require": [
+    "ts-node/register",
+    "source-map-support/register",
+    "global-jsdom/register"
+  ],
+  "recursive": true,
+  "extension": ["ts"],
+  "loader": "ts-node/esm",
+  "spec": ["src/**/*.test.ts"]
+}

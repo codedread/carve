@@ -1,8 +1,9 @@
 import { EditorHost } from '../editor-host.js';
-import { SimpleActionTool } from './tool.js'
+import { SimpleActionTool, Tool } from './tool.js'
 import { ToolbarButton } from '../toolbar-button.js';
 import { DEFAULT_DRAWING_STYLE, DrawingStyleChangedEvent } from '../drawing-style.js';
 import { ChangeAttributeCommand } from '../commands/change-attribute-command.js';
+import { ColorDialog } from '../ui/color-dialog.js';
 
 export const ACTION_PAINT_FILL = 'paint_fill';
 
@@ -10,8 +11,13 @@ export const ACTION_PAINT_FILL = 'paint_fill';
  * A tool that lets the user change the editor's fill paint.
  */
 export class PaintFillTool extends SimpleActionTool {
+  colorInput: HTMLInputElement;
+
   constructor(host: EditorHost) {
     super(host, { active: false, disabled: false});
+    this.colorInput = document.createElement('input');
+    this.colorInput.id = 'fill-color-input';
+    this.colorInput.setAttribute('type', 'color');
   }
 
   getActions(): string[] { return [ ACTION_PAINT_FILL ]; }
@@ -21,8 +27,7 @@ export class PaintFillTool extends SimpleActionTool {
    * fill of any selected elements.
    */
   async onDo(action: string) {
-    const fillColor = prompt(`What fill color?`);
-    // TODO: Match it to rgb, rrggbb, rgba, rrggbbaa, a color name or something?
+    let fillColor = await new ColorDialog().getColor('#ff0000', 'Fill color:');
     const drawingStyle = this.host.getDrawingStyle();
     drawingStyle.fill = fillColor;
     this.host.setDrawingStyle(drawingStyle);
@@ -42,9 +47,10 @@ export class PaintFillTool extends SimpleActionTool {
  * When the editor's drawing style changes, the button re-renders itself.
  */
 export class PaintFillButton extends ToolbarButton {
+  /** The color shown on the button. */
   fillColor: string = DEFAULT_DRAWING_STYLE.fill;
 
-  constructor(tool: SimpleActionTool) {
+  constructor(tool: Tool) {
     super(tool);
     tool.getHost().addEventListener(DrawingStyleChangedEvent.TYPE,
       (evt: DrawingStyleChangedEvent) => {

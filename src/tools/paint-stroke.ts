@@ -10,8 +10,13 @@ export const ACTION_PAINT_STROKE = 'paint_stroke';
  * A tool that lets the user change the editor's stroke paint.
  */
 export class PaintStrokeTool extends SimpleActionTool {
+  colorInput: HTMLInputElement;
+
   constructor(host: EditorHost) {
     super(host, { active: false, disabled: false});
+    this.colorInput = document.createElement('input');
+    this.colorInput.id = 'fill-color-input';
+    this.colorInput.setAttribute('type', 'color');
   }
 
   getActions(): string[] { return [ ACTION_PAINT_STROKE ]; }
@@ -21,8 +26,21 @@ export class PaintStrokeTool extends SimpleActionTool {
    * stroke of any selected elements.
    */
   async onDo(action: string) {
-    const strokeColor = prompt(`What stroke color?`);
-    // TODO: Match it to rgb, rrggbb, rgba, rrggbbaa, a color name or something?
+    let strokeColor: string;
+    if ('showPicker' in HTMLInputElement.prototype) {
+      strokeColor = await new Promise((resolve, reject) => {
+        this.colorInput.addEventListener('change', evt => {
+          resolve((evt.currentTarget as HTMLInputElement).value);
+        });
+        try { this.colorInput['showPicker'](); }
+        catch (err) { reject(err); }
+      });
+    } else {
+      // Fallback behavior...
+      strokeColor = prompt(`What stroke color?`);
+      // TODO: Match it to rgb, rrggbb, rgba, rrggbbaa, a color name or something?
+    }
+
     const drawingStyle = this.host.getDrawingStyle();
     drawingStyle.stroke = strokeColor;
     this.host.setDrawingStyle(drawingStyle);
@@ -42,6 +60,7 @@ export class PaintStrokeTool extends SimpleActionTool {
  * When the editor's drawing style changes, the button re-renders itself.
  */
 export class PaintStrokeButton extends ToolbarButton {
+  /** The color shown on the button. */
   strokeColor: string = DEFAULT_DRAWING_STYLE.stroke;
 
   constructor(tool: SimpleActionTool) {

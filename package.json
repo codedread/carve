@@ -3,12 +3,6 @@
   "version": "0.0.1",
   "description": "carve is a vector graphics editor",
   "type": "module",
-  "scripts": {
-    "copy-files": "copyfiles -u 1 -e \"src/**/*.ts\" src/*.* \"src/**/*.*\" dist",
-    "build": "tsc && npm run copy-files",
-    "test": "./node_modules/.bin/mocha --loader=ts-node/esm -r global-jsdom/register 'src/**/*.test.ts'",
-    "deploy": "npm run build && gh-pages -d dist"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/codedread/carve.git"
@@ -38,5 +32,11 @@
     "sinon": "^11.1.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
+  },
+  "scripts": {
+    "copy-files": "copyfiles -u 1 -e \"src/**/*.ts\" src/*.* \"src/**/*.*\" dist",
+    "build": "tsc && npm run copy-files",
+    "test": "./node_modules/.bin/mocha --loader=ts-node/esm -r global-jsdom/register 'src/**/*.test.ts'",
+    "deploy": "npm run build && gh-pages -d dist"
   }
 }

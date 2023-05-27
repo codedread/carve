@@ -107,6 +107,13 @@ export class CarveEditor extends HTMLElement implements EditorHost {
       }
     } else if (e instanceof ToolbarClickedEvent) {
       action = e.action;
+    /**
+     * TODO: Plan is this: Create a <dialog> that wraps the <input> and Cancel and Apply buttons.
+     * The dialog will be modal and all mouse events will be trapped there. Dialog needs to
+     * be rendered at run-time since not all browsers support showPicker() yet. Also, the
+     * actual fill/stroke color needs to be populated at dialog instantiation time.
+     * https://bugs.chromium.org/p/chromium/issues/detail?id=1343101#c2
+     */
     } else if (e instanceof MouseEvent && this.currentModeTool) {
       const style = window.getComputedStyle(this.workArea);
       const cme = toCarveMouseEvent(e, this.viewBox, parseInt(style['width'], 10),
@@ -251,7 +258,6 @@ export class CarveEditor extends HTMLElement implements EditorHost {
     this.topSVGElem = this.shadowRoot.querySelector(`#${CARVE_IMAGE}`);
     this.overlayElem = this.shadowRoot.querySelector(`#${CARVE_OVERLAY}`);
   }
-
   
   /** Registers a tool to handle a given action. */
   private registerToolForAction(action: string, tool: Tool) {
